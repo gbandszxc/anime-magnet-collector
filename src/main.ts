@@ -2,39 +2,47 @@
 import cssText from "./style.css";
 import { CONFIG } from "./config";
 import { createUtils } from "./utils";
+import { findAdapter } from "./sites/index";
+import { injectCheckboxColumn } from "./components/CheckboxColumn";
+import { injectToolbar } from "./components/Toolbar";
 
 const STYLE_ID = "anime-magnet-collector-style";
 const { log } = createUtils({ config: CONFIG });
 
 function injectStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
-
   if (typeof GM_addStyle === "function") {
     GM_addStyle(cssText);
-    const marker = document.createElement("style");
-    marker.id = STYLE_ID;
-    marker.textContent = "";
-    document.head.appendChild(marker);
-    return;
+  } else {
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = cssText;
+    document.head.appendChild(style);
   }
-
-  const style = document.createElement("style");
-  style.id = STYLE_ID;
-  style.textContent = cssText;
-  document.head.appendChild(style);
 }
 
 function init(): void {
   injectStyles();
-  // TODO: 在此实现核心功能逻辑
 
-  // 监听动态内容（适合 SPA / 无限滚动页面）
+  const adapter = findAdapter();
+  if (!adapter) {
+    log("未匹配的站点，脚本不执行");
+    return;
+  }
+
+  log(`检测到站点: ${adapter.siteName}`);
+
+  injectToolbar();
+  injectCheckboxColumn(adapter);
+
+  // 监听动态内容（SPA / 无限滚动页面）
   let timer: ReturnType<typeof setTimeout> | null = null;
   const observer = new MutationObserver(() => {
     if (timer) return;
     timer = setTimeout(() => {
       timer = null;
-      // TODO: 调用你的 DOM 注入函数
+      // 动态内容变化时重新注入 checkbox 列
+      injectCheckboxColumn(adapter);
     }, 300);
   });
 
