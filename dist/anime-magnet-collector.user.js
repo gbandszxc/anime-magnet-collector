@@ -37,8 +37,8 @@
     matchPatterns: ["https://share.dmhy.org/*"],
     tableSelector: "table#topic_list",
     rowSelector: "tbody tr",
-    magnetCellIndex: 3,
-    titleCellIndex: 2,
+    magnetCellIndex: 4,
+    titleCellIndex: 3,
     extractMagnet(row) {
       const cells = row.querySelectorAll("td");
       const cell = cells[this.magnetCellIndex];
