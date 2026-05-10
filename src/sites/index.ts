@@ -1,0 +1,14 @@
+import { dmhyAdapter } from "./dmhy";
+import type { SiteAdapter } from "./types";
+
+export const adapters: SiteAdapter[] = [dmhyAdapter];
+
+export function findAdapter(): SiteAdapter | undefined {
+  const url = window.location.href;
+  return adapters.find(a =>
+    a.matchPatterns.some(pattern => {
+      const regex = new RegExp("^" + pattern.replace(/\*/g, ".*") + "$");
+      return regex.test(url);
+    })
+  );
+}
