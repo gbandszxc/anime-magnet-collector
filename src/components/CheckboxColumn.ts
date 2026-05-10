@@ -13,9 +13,8 @@ function findCellIndex(adapter: SiteAdapter, headerText: string): number {
   for (let i = 0; i < headers.length; i++) {
     const text = headers[i].textContent?.trim() ?? "";
     if (text === headerText) {
-      // 减去已注入的 checkbox 列数量（每找到一个匹配就减一，因为 checkbox 列在最前面）
-      const checkboxCols = table.querySelectorAll("th.amc-checkbox-col").length;
-      return i - checkboxCols;
+      // checkbox th 会在 prepend 后位于最左侧，所以 data column index = i + 1（跳过 checkbox）
+      return i + 1;
     }
   }
   return -1;
@@ -25,19 +24,16 @@ export function getColumnIndices(adapter: SiteAdapter): { titleCellIndex: number
   const table = document.querySelector<HTMLTableElement>(adapter.tableSelector);
   if (!table) return { titleCellIndex: -1, magnetCellIndex: -1 };
 
-  // title: 通过表头文字定位
   const titleIdx = findCellIndex(adapter, adapter.titleHeader);
 
-  // magnet: 通过 selector 找到对应 td 的位置
+  // magnet: 通过 selector 找到磁链 td 在行中的索引
   const firstRow = table.querySelector(adapter.rowSelector);
   const magnetEl = firstRow?.querySelector(adapter.magnetCellSelector);
   const magnetTd = magnetEl?.parentElement as HTMLTableCellElement | null;
-  const checkboxCols = table.querySelectorAll("th.amc-checkbox-col").length;
-  // parentElement 是 td，td 在行里的索引需要减去 checkbox td 的影响
-  // 但问题是：magnet td 前面有没有 checkbox td？应该没有，因为 checkbox td 是在 preprend 后才插入行的
-  // 但行已经 prepend 了 checkbox td，所以行里第一个 td 是 checkbox，然后才是原始 td
-  // magnet td 的索引（从0开始）= 其在 preprend 后的位置 - 1（减去 checkbox td）
-  const magnetIdx = magnetTd ? Array.from(magnetTd.parentElement!.children).indexOf(magnetTd) - 1 : -1;
+  // magnet td 的索引 +1（留给 prepend 的 checkbox td）
+  const magnetIdx = magnetTd
+    ? Array.from(magnetTd.parentElement!.children).indexOf(magnetTd) + 1
+    : -1;
 
   return { titleCellIndex: titleIdx, magnetCellIndex: magnetIdx };
 }
