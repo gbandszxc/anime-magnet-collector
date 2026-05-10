@@ -11,7 +11,7 @@ export function injectToolbar(): void {
   document.body.appendChild(toolbar);
 
   const countEl = document.getElementById("amc-count")!;
-  const copyBtn = document.getElementById("amc-copy-btn")!;
+  const copyBtn = document.getElementById("amc-copy-btn") as HTMLButtonElement;
 
   selectionStore.onChange((count) => {
     countEl.textContent = String(count);

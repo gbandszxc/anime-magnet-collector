@@ -37,17 +37,17 @@
     matchPatterns: ["https://share.dmhy.org/*"],
     tableSelector: "table#topic_list",
     rowSelector: "tbody tr",
-    magnetCellIndex: 4,
-    titleCellIndex: 3,
+    titleHeader: "標題",
+    magnetCellSelector: 'a[href^="magnet:"]',
     extractMagnet(row) {
-      const cells = row.querySelectorAll("td");
-      const cell = cells[this.magnetCellIndex];
-      const link = cell?.querySelector('a[href^="magnet:"]');
+      const link = row.querySelector(this.magnetCellSelector);
       return link?.href ?? "";
     },
     extractTitle(row) {
+      const adapterExt = this;
+      const idx = adapterExt._titleIdx ?? 3;
       const cells = row.querySelectorAll("td");
-      const cell = cells[this.titleCellIndex];
+      const cell = cells[idx];
       if (!cell) return "";
       const lastLink = cell.querySelector("a:last-of-type");
       return lastLink?.textContent?.trim() ?? cell.textContent.trim();
@@ -111,6 +111,32 @@
   var selectionStore = new SelectionStore();
 
   // src/components/CheckboxColumn.ts
+  function findCellIndex(adapter, headerText) {
+    const table = document.querySelector(adapter.tableSelector);
+    if (!table) return -1;
+    const thead = table.querySelector("thead");
+    if (!thead) return -1;
+    const headers = thead.querySelectorAll("th");
+    for (let i = 0; i < headers.length; i++) {
+      const text = headers[i].textContent?.trim() ?? "";
+      if (text === headerText) {
+        const checkboxCols = table.querySelectorAll("th.amc-checkbox-col").length;
+        return i - checkboxCols;
+      }
+    }
+    return -1;
+  }
+  function getColumnIndices(adapter) {
+    const table = document.querySelector(adapter.tableSelector);
+    if (!table) return { titleCellIndex: -1, magnetCellIndex: -1 };
+    const titleIdx = findCellIndex(adapter, adapter.titleHeader);
+    const firstRow = table.querySelector(adapter.rowSelector);
+    const magnetEl = firstRow?.querySelector(adapter.magnetCellSelector);
+    const magnetTd = magnetEl?.parentElement;
+    const checkboxCols = table.querySelectorAll("th.amc-checkbox-col").length;
+    const magnetIdx = magnetTd ? Array.from(magnetTd.parentElement.children).indexOf(magnetTd) - 1 : -1;
+    return { titleCellIndex: titleIdx, magnetCellIndex: magnetIdx };
+  }
   function injectCheckboxColumn(adapter) {
     const table = document.querySelector(adapter.tableSelector);
     if (!table) return;
@@ -118,6 +144,8 @@
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");
     if (!thead || !tbody) return;
+    const indices = getColumnIndices(adapter);
+    adapter._titleIdx = indices.titleCellIndex;
     const th = document.createElement("th");
     th.className = "amc-checkbox-col";
     th.style.width = "30px";

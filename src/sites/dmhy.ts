@@ -6,21 +6,20 @@ export const dmhyAdapter: SiteAdapter = {
   matchPatterns: ["https://share.dmhy.org/*"],
   tableSelector: "table#topic_list",
   rowSelector: "tbody tr",
-  magnetCellIndex: 3,
-  titleCellIndex: 2,
+  titleHeader: "標題",
+  magnetCellSelector: 'a[href^="magnet:"]',
 
   extractMagnet(row: Element): string {
-    const cells = row.querySelectorAll("td");
-    const cell = cells[this.magnetCellIndex];
-    const link = cell?.querySelector('a[href^="magnet:"]') as HTMLAnchorElement | null;
+    const link = row.querySelector<HTMLAnchorElement>(this.magnetCellSelector);
     return link?.href ?? "";
   },
 
   extractTitle(row: Element): string {
+    const adapterExt = this as SiteAdapter & { _titleIdx?: number };
+    const idx = adapterExt._titleIdx ?? 3;
     const cells = row.querySelectorAll("td");
-    const cell = cells[this.titleCellIndex];
+    const cell = cells[idx];
     if (!cell) return "";
-    // 标题在 <a> 标签或直接文本中，取最后一层文本
     const lastLink = cell.querySelector("a:last-of-type");
     return lastLink?.textContent?.trim() ?? cell.textContent.trim();
   },

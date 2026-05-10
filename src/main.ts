@@ -35,18 +35,8 @@ function init(): void {
   injectToolbar();
   injectCheckboxColumn(adapter);
 
-  // 监听动态内容（SPA / 无限滚动页面）
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  const observer = new MutationObserver(() => {
-    if (timer) return;
-    timer = setTimeout(() => {
-      timer = null;
-      // 动态内容变化时重新注入 checkbox 列
-      injectCheckboxColumn(adapter);
-    }, 300);
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
+  // dmhy 是静态分页，不需要 MutationObserver。
+  // 如果后续站点有 SPA/无限滚动需求，在这里针对性的监听对应 table tbody。
 
   log("初始化完成");
 }
