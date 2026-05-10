@@ -114,6 +114,7 @@
   function injectCheckboxColumn(adapter) {
     const table = document.querySelector(adapter.tableSelector);
     if (!table) return;
+    if (table.querySelector(".amc-checkbox-col")) return;
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");
     if (!thead || !tbody) return;
@@ -296,15 +297,6 @@
     log(`检测到站点: ${adapter.siteName}`);
     injectToolbar();
     injectCheckboxColumn(adapter);
-    let timer = null;
-    const observer = new MutationObserver(() => {
-      if (timer) return;
-      timer = setTimeout(() => {
-        timer = null;
-        injectCheckboxColumn(adapter);
-      }, 300);
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
     log("初始化完成");
   }
   if (document.readyState === "loading") {
