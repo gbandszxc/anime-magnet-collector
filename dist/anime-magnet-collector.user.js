@@ -4,6 +4,7 @@
 // @version      1.0.0
 // @description  动漫BT站点增加复选框批量复制磁力链接
 // @author       gbandszxc
+// @match      https://share.dmhy.org/*
 // @grant      GM_addStyle
 // @grant      GM_log
 // @updateURL    https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/dist/anime-magnet-collector.user.js
