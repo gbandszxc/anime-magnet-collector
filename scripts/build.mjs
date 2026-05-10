@@ -18,19 +18,23 @@ const entryFile = path.join(projectRoot, "src", "main.ts");
 const outputFile = path.join(projectRoot, distRelativePath);
 const isWatchMode = process.argv.includes("--watch");
 
-// Dynamically read match patterns from site adapters
-const sitesIndexPath = path.join(projectRoot, "src", "sites", "index.ts");
-const sitesIndexContent = await readFile(sitesIndexPath, "utf8");
-const matchPatternRegex = /matchPatterns:\s*\[\s*([^\]]+)\s*\]/g;
+// Dynamically read match patterns from site adapter files
+const sitesDir = path.join(projectRoot, "src", "sites");
 const matchLines = [];
-let matchMatch;
-while ((matchMatch = matchPatternRegex.exec(sitesIndexContent)) !== null) {
-  const patternsStr = matchMatch[1];
-  const patterns = patternsStr.match(/["']([^"']+)["']/g) || [];
-  patterns.forEach(p => {
-    const pattern = p.replace(/["']/g, "");
-    matchLines.push(`// @match      ${pattern}`);
-  });
+const files = ["dmhy.ts"]; // Add new site adapters here
+for (const file of files) {
+  const filePath = path.join(sitesDir, file);
+  const content = await readFile(filePath, "utf8");
+  const regex = /matchPatterns:\s*\[\s*([^\]]+)\s*\]/g;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    const patternsStr = match[1];
+    const patterns = patternsStr.match(/["']([^"']+)["']/g) || [];
+    patterns.forEach(p => {
+      const pattern = p.replace(/["']/g, "");
+      matchLines.push(`// @match      ${pattern}`);
+    });
+  }
 }
 
 const grantLines = [
