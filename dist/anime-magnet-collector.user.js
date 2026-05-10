@@ -120,8 +120,7 @@
     for (let i = 0; i < headers.length; i++) {
       const text = headers[i].textContent?.trim() ?? "";
       if (text === headerText) {
-        const checkboxCols = table.querySelectorAll("th.amc-checkbox-col").length;
-        return i - checkboxCols;
+        return i + 1;
       }
     }
     return -1;
@@ -133,8 +132,7 @@
     const firstRow = table.querySelector(adapter.rowSelector);
     const magnetEl = firstRow?.querySelector(adapter.magnetCellSelector);
     const magnetTd = magnetEl?.parentElement;
-    const checkboxCols = table.querySelectorAll("th.amc-checkbox-col").length;
-    const magnetIdx = magnetTd ? Array.from(magnetTd.parentElement.children).indexOf(magnetTd) - 1 : -1;
+    const magnetIdx = magnetTd ? Array.from(magnetTd.parentElement.children).indexOf(magnetTd) + 1 : -1;
     return { titleCellIndex: titleIdx, magnetCellIndex: magnetIdx };
   }
   function injectCheckboxColumn(adapter) {
