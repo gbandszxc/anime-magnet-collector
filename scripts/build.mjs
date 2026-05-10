@@ -1,0 +1,72 @@
+import path from "node:path";
+import { mkdir, readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { build, context } from "esbuild";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, "..");
+
+const packageJson = JSON.parse(await readFile(path.join(projectRoot, "package.json"), "utf8"));
+const version = packageJson.version;
+const distRelativePath = "dist/anime-magnet-collector.user.js";
+const rawDistUrl = "gbandszxc"
+  ? `https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/${distRelativePath}`
+  : null;
+
+const entryFile = path.join(projectRoot, "src", "main.ts");
+const outputFile = path.join(projectRoot, distRelativePath);
+const isWatchMode = process.argv.includes("--watch");
+
+const matchLines = [
+`// @match      https://*/*`
+];
+
+const grantLines = [
+`// @grant      GM_addStyle`,
+`// @grant      GM_log`
+];
+
+const metadataLines = [
+  "// ==UserScript==",
+  "// @name         Anime Magnet Collector",
+  "// @namespace    http://tampermonkey.net/",
+  `// @version      ${version}`,
+  "// @description  动漫BT站点增加复选框批量复制磁力链接",
+  "// @author       gbandszxc",
+  ...matchLines,
+  ...grantLines,
+  ...(rawDistUrl ? [
+    `// @updateURL    ${rawDistUrl}`,
+    `// @downloadURL  ${rawDistUrl}`,
+  ] : []),
+  "// @license      MIT",
+  "// ==/UserScript=="
+];
+
+const metadata = metadataLines.join("\n");
+
+const buildOptions = {
+  entryPoints: [entryFile],
+  outfile: outputFile,
+  bundle: true,
+  format: "iife",
+  platform: "browser",
+  target: "es2020",
+  charset: "utf8",
+  legalComments: "none",
+  // esbuild 原生支持 TypeScript，无需额外 loader
+  loader: { ".css": "text" },
+  banner: { js: `${metadata}\n` }
+};
+
+await mkdir(path.dirname(outputFile), { recursive: true });
+
+if (isWatchMode) {
+  const ctx = await context(buildOptions);
+  await ctx.watch();
+  console.log("Watching build...");
+} else {
+  await build(buildOptions);
+  console.log(`Build completed: ${outputFile}`);
+}
