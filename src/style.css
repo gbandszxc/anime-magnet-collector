@@ -1,3 +1,158 @@
-/* Anime Magnet Collector 样式 */
+/* ========================
+   Anime Magnet Collector
+   ======================== */
 
-/* TODO: 在此添加注入到页面的样式 */
+/* Toolbar */
+#amc-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 2147483647;
+  font-size: 14px;
+  font-family: system-ui, sans-serif;
+}
+
+.amc-toolbar-info {
+  color: #333;
+}
+
+#amc-copy-btn:not(:disabled) {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#amc-copy-btn:disabled {
+  background: #ccc;
+  color: #888;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: not-allowed;
+}
+
+.amc-btn {
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.amc-btn-primary {
+  background: #4CAF50;
+  color: white;
+  border: none;
+}
+
+/* Checkbox Column */
+.amc-checkbox-col {
+  padding: 4px !important;
+}
+
+.amc-checkbox-row,
+.amc-checkbox-header {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Modal Overlay */
+.amc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2147483647;
+  font-family: system-ui, sans-serif;
+}
+
+/* Modal */
+.amc-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.amc-modal-header {
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.amc-modal-list {
+  padding: 12px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.amc-modal-item {
+  display: flex;
+  padding: 6px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.amc-modal-num {
+  color: #888;
+  margin-right: 8px;
+  min-width: 24px;
+}
+
+.amc-modal-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.amc-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Toast */
+.amc-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 2147483647;
+  font-family: system-ui, sans-serif;
+  animation: amc-fade-in 0.2s ease;
+}
+
+@keyframes amc-fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
