@@ -18,9 +18,20 @@ const entryFile = path.join(projectRoot, "src", "main.ts");
 const outputFile = path.join(projectRoot, distRelativePath);
 const isWatchMode = process.argv.includes("--watch");
 
-const matchLines = [
-`// @match      https://*/*`
-];
+// Dynamically read match patterns from site adapters
+const sitesIndexPath = path.join(projectRoot, "src", "sites", "index.ts");
+const sitesIndexContent = await readFile(sitesIndexPath, "utf8");
+const matchPatternRegex = /matchPatterns:\s*\[\s*([^\]]+)\s*\]/g;
+const matchLines = [];
+let matchMatch;
+while ((matchMatch = matchPatternRegex.exec(sitesIndexContent)) !== null) {
+  const patternsStr = matchMatch[1];
+  const patterns = patternsStr.match(/["']([^"']+)["']/g) || [];
+  patterns.forEach(p => {
+    const pattern = p.replace(/["']/g, "");
+    matchLines.push(`// @match      ${pattern}`);
+  });
+}
 
 const grantLines = [
 `// @grant      GM_addStyle`,
