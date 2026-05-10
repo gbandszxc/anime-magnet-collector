@@ -240,7 +240,7 @@
         ${selectedItems.map((item, i) => `
           <div class="amc-modal-item">
             <span class="amc-modal-num">${i + 1}.</span>
-            <span class="amc-modal-title">${formatTitle(item.title)}</span>
+            <span class="amc-modal-title" title="${item.title}">${formatTitle(item.title)}</span>
           </div>
         `).join("")}
       </div>
