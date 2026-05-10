@@ -20,8 +20,8 @@ export const dmhyAdapter: SiteAdapter = {
     const cells = row.querySelectorAll("td");
     const cell = cells[idx];
     if (!cell) return "";
-    const lastLink = cell.querySelector("a:last-of-type");
-    return lastLink?.textContent?.trim() ?? cell.textContent.trim();
+    // 取整个 td 的文本内容，合并多余空白
+    return cell.textContent?.trim().replace(/\s+/g, " ") ?? "";
   },
 
   buildShortMagnet(magnet: string): string | null {

@@ -49,8 +49,7 @@
       const cells = row.querySelectorAll("td");
       const cell = cells[idx];
       if (!cell) return "";
-      const lastLink = cell.querySelector("a:last-of-type");
-      return lastLink?.textContent?.trim() ?? cell.textContent.trim();
+      return cell.textContent?.trim().replace(/\s+/g, " ") ?? "";
     },
     buildShortMagnet(magnet) {
       return null;
