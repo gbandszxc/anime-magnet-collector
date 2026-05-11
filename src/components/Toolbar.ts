@@ -56,7 +56,7 @@ function initFloatPanel(panel: HTMLElement): void {
   const edgeMargin = 16;
 
   function getDefaultPosition(): Position {
-    return { x: window.innerWidth - panel.offsetWidth - edgeMargin, y: window.innerHeight / 2 - panel.offsetHeight / 2 };
+    return { x: edgeMargin, y: edgeMargin };
   }
 
   function initPosition(): void {
@@ -64,7 +64,7 @@ function initFloatPanel(panel: HTMLElement): void {
     panel.style.left = `${pos.x}px`;
     panel.style.top = `${pos.y}px`;
     panel.style.right = "auto";
-    state.snapped = "right";
+    state.snapped = "left";
   }
 
   function snapToEdge(mouseX: number): void {

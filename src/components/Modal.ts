@@ -40,9 +40,9 @@ export function openModal(): void {
         `).join("")}
       </div>
       <div class="amc-modal-footer">
-        <button id="amc-copy-long" class="amc-btn amc-btn-primary">复制长链</button>
-        <button id="amc-copy-short" class="amc-btn" disabled title="该站点暂不支持短链">复制短链(暂不可用)</button>
-        <button id="amc-cancel" class="amc-btn">取消</button>
+        <button id="amc-copy-long" class="amc-float-btn">复制长链</button>
+        <button id="amc-copy-short" class="amc-float-btn" disabled title="该站点暂不支持短链">复制短链(暂不可用)</button>
+        <button id="amc-cancel" class="amc-float-btn">取消</button>
       </div>
     </div>
   `;
