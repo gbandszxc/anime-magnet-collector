@@ -16,9 +16,12 @@ export const nyaaAdapter: SiteAdapter = {
   },
 
   extractTitle(row: Element): string {
+    const adapterExt = this as SiteAdapter & { _titleIdx?: number };
+    const idx = adapterExt._titleIdx ?? 1;
     const cells = row.querySelectorAll("td");
-    const cell = cells[1];
-    return cell?.textContent?.trim().replace(/\s+/g, " ") ?? "";
+    const cell = cells[idx];
+    if (!cell) return "";
+    return cell.textContent?.trim().replace(/\s+/g, " ") ?? "";
   },
 
   buildShortMagnet(magnet: string): string | null {

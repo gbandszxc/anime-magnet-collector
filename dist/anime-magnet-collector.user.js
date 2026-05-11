@@ -90,8 +90,34 @@
     matchPatterns: ["https://dmhy.anoneko.com/*"]
   };
 
+  // src/sites/nyaa.ts
+  var nyaaAdapter = {
+    siteId: "nyaa",
+    siteName: "Nyaa",
+    matchPatterns: ["https://nyaa.si/*"],
+    tableSelector: "table",
+    rowSelector: "tbody tr",
+    titleHeader: "Name",
+    magnetCellSelector: 'a[href^="magnet:"]',
+    extractMagnet(row) {
+      const link = row.querySelector(this.magnetCellSelector);
+      return link?.href ?? "";
+    },
+    extractTitle(row) {
+      const adapterExt = this;
+      const idx = adapterExt._titleIdx ?? 1;
+      const cells = row.querySelectorAll("td");
+      const cell = cells[idx];
+      if (!cell) return "";
+      return cell.textContent?.trim().replace(/\s+/g, " ") ?? "";
+    },
+    buildShortMagnet(magnet) {
+      return buildShortMagnet(magnet);
+    }
+  };
+
   // src/sites/index.ts
-  var adapters = [dmhyAdapter, anonekoAdapter];
+  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter];
   function findAdapter() {
     const url = window.location.href;
     return adapters.find(
