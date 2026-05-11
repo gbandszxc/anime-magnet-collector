@@ -21,7 +21,10 @@ export const nyaaAdapter: SiteAdapter = {
     const cells = row.querySelectorAll("td");
     const cell = cells[idx];
     if (!cell) return "";
-    return cell.textContent?.trim().replace(/\s+/g, " ") ?? "";
+
+    const titleLink = cell.querySelector<HTMLAnchorElement>('a[href^="/view/"]:not(.comments):not([href$="#comments"])');
+    const title = titleLink?.title || titleLink?.textContent || cell.textContent;
+    return title?.trim().replace(/\s+/g, " ") ?? "";
   },
 
   buildShortMagnet(magnet: string): string | null {
