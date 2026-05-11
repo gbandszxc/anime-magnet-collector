@@ -165,7 +165,6 @@
   justify-content: center;
   z-index: var(--amc-z-float);
   font-family: var(--amc-font-family);
-  animation: amc-fade-in var(--amc-duration-normal) var(--amc-ease-out);
 }
 
 /* Modal */
@@ -179,6 +178,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  animation: amc-modal-enter var(--amc-duration-normal) var(--amc-ease-out);
 }
 
 .amc-modal-header {
@@ -263,10 +263,6 @@
 }
 
 /* Modal animation - center origin */
-.amc-modal-overlay .amc-modal {
-  animation: amc-modal-enter var(--amc-duration-normal) var(--amc-ease-out);
-}
-
 @keyframes amc-modal-enter {
   from {
     opacity: 0;
