@@ -9,3 +9,5 @@ pnpm-debug.log*
 Thumbs.db
 
 .worktrees/
+
+tmp

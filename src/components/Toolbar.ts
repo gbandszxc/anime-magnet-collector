@@ -5,7 +5,7 @@ export function injectToolbar(): void {
   const toolbar = document.createElement("div");
   toolbar.id = "amc-float";
   toolbar.innerHTML = `
-    <div class="amc-float-handle" title="收起">
+    <div class="amc-float-handle" title="收起/展开">
       <svg class="amc-float-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
       </svg>
@@ -42,21 +42,19 @@ interface Position {
 
 function initFloatPanel(panel: HTMLElement): void {
   const handle = panel.querySelector(".amc-float-handle") as HTMLElement;
-  const content = panel.querySelector(".amc-float-content") as HTMLElement;
+
   const state: {
     dragging: boolean;
     offset: Position;
     snapped: "left" | "right" | null;
-    collapsed: boolean;
   } = {
     dragging: false,
     offset: { x: 0, y: 0 },
     snapped: null,
-    collapsed: false,
   };
 
   const edgeMargin = 16;
-  const collapsedOffset = 40; // 收起时露出的宽度
+  const moveThreshold = 5; // 移动超过5px才算拖动
 
   function getDefaultPosition(): Position {
     return { x: edgeMargin, y: edgeMargin };
@@ -68,20 +66,16 @@ function initFloatPanel(panel: HTMLElement): void {
     panel.style.top = `${pos.y}px`;
     panel.style.right = "auto";
     state.snapped = "left";
-    state.collapsed = false;
-    panel.classList.remove("amc-float-collapsed");
   }
 
   function snapToEdge(mouseX: number): void {
     const viewportWidth = window.innerWidth;
 
     if (mouseX < viewportWidth / 2) {
-      // Snap left
       panel.style.left = `${edgeMargin}px`;
       panel.style.right = "auto";
       state.snapped = "left";
     } else {
-      // Snap right
       panel.style.left = "auto";
       panel.style.right = `${edgeMargin}px`;
       state.snapped = "right";
@@ -89,13 +83,11 @@ function initFloatPanel(panel: HTMLElement): void {
   }
 
   function toggleCollapse(): void {
-    const panelRect = panel.getBoundingClientRect();
     const isCollapsed = panel.classList.contains("amc-float-collapsed");
 
     if (isCollapsed) {
-      // Expand
       panel.classList.remove("amc-float-collapsed");
-      handle.title = "收起";
+      handle.title = "收起/展开";
       if (state.snapped === "left") {
         panel.style.left = `${edgeMargin}px`;
         panel.style.right = "auto";
@@ -104,47 +96,116 @@ function initFloatPanel(panel: HTMLElement): void {
         panel.style.right = `${edgeMargin}px`;
       }
     } else {
-      // Collapse
       panel.classList.add("amc-float-collapsed");
       handle.title = "展开";
       if (state.snapped === "left") {
-        // 左侧吸附时，从左侧缩进去一半
         panel.style.left = `${edgeMargin}px`;
         panel.style.right = "auto";
       } else {
-        // 右侧吸附时，从右侧缩进去一半
         panel.style.left = "auto";
         panel.style.right = `${edgeMargin}px`;
       }
     }
   }
 
-  function onMouseDown(e: MouseEvent): void {
+  // 鼠标按下
+  let dragStartPos: Position | null = null;
+
+  handle.addEventListener("mousedown", (e: MouseEvent) => {
     if ((e.target as HTMLElement).closest(".amc-float-btn")) return;
     e.preventDefault();
-    state.dragging = true;
-    const rect = panel.getBoundingClientRect();
-    state.offset.x = e.clientX - rect.left;
-    state.offset.y = e.clientY - rect.top;
-    panel.classList.add("amc-float-dragging");
-  }
-
-  function onMouseMove(e: MouseEvent): void {
-    if (!state.dragging) return;
-    const x = e.clientX - state.offset.x;
-    const y = e.clientY - state.offset.y;
-    panel.style.left = `${x}px`;
-    panel.style.top = `${y}px`;
-    panel.style.right = "auto";
-    state.snapped = null;
-  }
-
-  function onMouseUp(e: MouseEvent): void {
-    if (!state.dragging) return;
+    dragStartPos = { x: e.clientX, y: e.clientY };
     state.dragging = false;
-    panel.classList.remove("amc-float-dragging");
-    snapToEdge(e.clientX);
-  }
+  });
+
+  document.addEventListener("mousemove", (e: MouseEvent) => {
+    if (!dragStartPos) return;
+
+    const dx = e.clientX - dragStartPos.x;
+    const dy = e.clientY - dragStartPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > moveThreshold) {
+      // 开始拖动
+      state.dragging = true;
+      const rect = panel.getBoundingClientRect();
+      state.offset.x = e.clientX - rect.left;
+      state.offset.y = e.clientY - rect.top;
+      panel.classList.add("amc-float-dragging");
+      dragStartPos = null;
+    }
+
+    if (state.dragging) {
+      panel.style.left = `${e.clientX - state.offset.x}px`;
+      panel.style.top = `${e.clientY - state.offset.y}px`;
+      panel.style.right = "auto";
+      state.snapped = null;
+    }
+  });
+
+  document.addEventListener("mouseup", (e: MouseEvent) => {
+    if (state.dragging) {
+      state.dragging = false;
+      panel.classList.remove("amc-float-dragging");
+      snapToEdge(e.clientX);
+    } else if (dragStartPos) {
+      // 点击事件
+      toggleCollapse();
+    }
+    dragStartPos = null;
+  });
+
+  // Touch support
+  handle.addEventListener("touchstart", (e: TouchEvent) => {
+    if ((e.target as HTMLElement).closest(".amc-float-btn")) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    dragStartPos = { x: touch.clientX, y: touch.clientY };
+    state.dragging = false;
+  }, { passive: false });
+
+  document.addEventListener("touchmove", (e: TouchEvent) => {
+    if (!dragStartPos) return;
+    const touch = e.touches[0];
+
+    const dx = touch.clientX - dragStartPos.x;
+    const dy = touch.clientY - dragStartPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > moveThreshold) {
+      state.dragging = true;
+      const rect = panel.getBoundingClientRect();
+      state.offset.x = touch.clientX - rect.left;
+      state.offset.y = touch.clientY - rect.top;
+      panel.classList.add("amc-float-dragging");
+      dragStartPos = null;
+    }
+
+    if (state.dragging) {
+      panel.style.left = `${touch.clientX - state.offset.x}px`;
+      panel.style.top = `${touch.clientY - state.offset.y}px`;
+      panel.style.right = "auto";
+      state.snapped = null;
+    }
+  });
+
+  document.addEventListener("touchend", (e: TouchEvent) => {
+    if (state.dragging) {
+      state.dragging = false;
+      panel.classList.remove("amc-float-dragging");
+      const touch = e.changedTouches[0];
+      snapToEdge(touch.clientX);
+    } else if (dragStartPos) {
+      toggleCollapse();
+    }
+    dragStartPos = null;
+  });
+
+  // 双击手柄也可折叠
+  handle.addEventListener("dblclick", (e: MouseEvent) => {
+    e.preventDefault();
+    toggleCollapse();
+  });
 
   function onResize(): void {
     if (state.snapped === "left") {
@@ -156,59 +217,7 @@ function initFloatPanel(panel: HTMLElement): void {
     }
   }
 
-  // Click handle to collapse/expand (only if not dragging)
-  let clickMoved = false;
-  handle.addEventListener("mousedown", () => {
-    clickMoved = false;
-  });
-  handle.addEventListener("mousemove", () => {
-    clickMoved = true;
-  });
-  handle.addEventListener("mouseup", (e: MouseEvent) => {
-    if (!clickMoved) {
-      toggleCollapse();
-    } else {
-      clickMoved = false;
-    }
-  });
-
-  handle.addEventListener("touchstart", (e: TouchEvent) => {
-    if ((e.target as HTMLElement).closest(".amc-float-btn")) return;
-    e.preventDefault();
-    const touch = e.touches[0];
-    state.dragging = true;
-    const rect = panel.getBoundingClientRect();
-    state.offset.x = touch.clientX - rect.left;
-    state.offset.y = touch.clientY - rect.top;
-    panel.classList.add("amc-float-dragging");
-  }, { passive: false });
-
-  document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("mouseup", onMouseUp);
   window.addEventListener("resize", onResize);
-
-  document.addEventListener("touchmove", (e: TouchEvent) => {
-    if (!state.dragging) return;
-    const touch = e.touches[0];
-    panel.style.left = `${touch.clientX - state.offset.x}px`;
-    panel.style.top = `${touch.clientY - state.offset.y}px`;
-    panel.style.right = "auto";
-    state.snapped = null;
-  });
-
-  document.addEventListener("touchend", (e: TouchEvent) => {
-    if (!state.dragging) return;
-    state.dragging = false;
-    panel.classList.remove("amc-float-dragging");
-    const touch = e.changedTouches[0];
-    snapToEdge(touch.clientX);
-  });
-
-  // Double click to collapse
-  handle.addEventListener("dblclick", (e: MouseEvent) => {
-    e.preventDefault();
-    toggleCollapse();
-  });
 
   // Initialize position after layout
   requestAnimationFrame(initPosition);
