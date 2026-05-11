@@ -120,3 +120,11 @@ export function injectCheckboxColumn(adapter: SiteAdapter): void {
     updateHeaderState();
   });
 }
+
+export function removeCheckboxColumn(adapter: SiteAdapter): void {
+  const table = document.querySelector<HTMLTableElement>(adapter.tableSelector);
+  if (!table) return;
+
+  table.querySelectorAll(".amc-checkbox-col").forEach((cell) => cell.remove());
+  selectionStore.deselectAll();
+}

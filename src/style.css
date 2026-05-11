@@ -165,6 +165,47 @@
   cursor: not-allowed;
 }
 
+.amc-float-close-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  background: rgba(238, 238, 238, 0.82);
+  color: var(--amc-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: color var(--amc-duration-fast) var(--amc-ease-out),
+              background var(--amc-duration-fast) var(--amc-ease-out),
+              border-color var(--amc-duration-fast) var(--amc-ease-out),
+              opacity var(--amc-duration-fast) var(--amc-ease-out);
+}
+
+#amc-float:hover .amc-float-close-btn,
+.amc-float-close-btn:focus-visible {
+  opacity: 0.72;
+  pointer-events: auto;
+}
+
+.amc-float-close-btn:hover {
+  color: var(--amc-text-primary);
+  background: rgba(224, 224, 224, 0.96);
+  border-color: rgba(0, 0, 0, 0.14);
+  opacity: 1;
+}
+
+.amc-float-close-btn:focus-visible {
+  outline: 2px solid rgba(76, 175, 80, 0.45);
+  outline-offset: 2px;
+}
+
 /* Modal Overlay */
 .amc-modal-overlay {
   position: fixed;

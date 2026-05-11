@@ -1,7 +1,11 @@
 import { selectionStore } from "./SelectionStore";
 import { openModal } from "./Modal";
 
-export function injectToolbar(): void {
+type ToolbarOptions = {
+  onClose?: () => void;
+};
+
+export function injectToolbar(options: ToolbarOptions = {}): void {
   const toolbar = document.createElement("div");
   toolbar.id = "amc-float";
   toolbar.innerHTML = `
@@ -32,11 +36,17 @@ export function injectToolbar(): void {
       <span class="amc-float-count"><span id="amc-count">0</span> 项</span>
       <button id="amc-copy-btn" class="amc-float-btn" disabled>复制</button>
     </div>
+    <button id="amc-close-btn" class="amc-float-close-btn" title="关闭并恢复页面" aria-label="关闭并恢复页面">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M18 6 6 18"/><path d="M6 6l12 12"/>
+      </svg>
+    </button>
   `;
   document.body.appendChild(toolbar);
 
   const countEl = document.getElementById("amc-count")!;
   const copyBtn = document.getElementById("amc-copy-btn") as HTMLButtonElement;
+  const closeBtn = document.getElementById("amc-close-btn") as HTMLButtonElement;
 
   selectionStore.onChange((count) => {
     countEl.textContent = String(count);
@@ -47,6 +57,13 @@ export function injectToolbar(): void {
     if (selectionStore.getCount() > 0) {
       openModal();
     }
+  });
+
+  closeBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    document.querySelector(".amc-modal-overlay")?.remove();
+    toolbar.remove();
+    options.onClose?.();
   });
 
   // Draggable floating panel

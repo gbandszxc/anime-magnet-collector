@@ -3,7 +3,7 @@ import cssText from "./style.css";
 import { CONFIG } from "./config";
 import { createUtils } from "./utils";
 import { findAdapter } from "./sites/index";
-import { injectCheckboxColumn } from "./components/CheckboxColumn";
+import { injectCheckboxColumn, removeCheckboxColumn } from "./components/CheckboxColumn";
 import { injectToolbar } from "./components/Toolbar";
 
 const STYLE_ID = "anime-magnet-collector-style";
@@ -32,7 +32,9 @@ function init(): void {
 
   log(`检测到站点: ${adapter.siteName}`);
 
-  injectToolbar();
+  injectToolbar({
+    onClose: () => removeCheckboxColumn(adapter),
+  });
   injectCheckboxColumn(adapter);
 
   // dmhy 是静态分页，不需要 MutationObserver。
