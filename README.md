@@ -1,6 +1,8 @@
-# Anime Magnet Collector
-
-> 动漫花园磁力链接批量复制工具 - 简洁高效，一键导出
+<div align="center">
+  <img src="https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/src/assets/icons/anime-magnet-collector.png" alt="Anime Magnet Collector" width="64" height="64" />
+  <h1>Anime Magnet Collector</h1>
+  <p>动漫花园磁力链接批量复制工具 - 简洁高效，一键导出</p>
+</div>
 
 ---
 

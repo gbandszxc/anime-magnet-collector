@@ -4,6 +4,7 @@
 // @version      1.0.0
 // @description  动漫BT站点增加复选框批量复制磁力链接
 // @author       gbandszxc
+// @icon      data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2IiBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiPgogIDx0aXRsZT5BbmltZSBtYWduZXQgbWFzY290IGljb248L3RpdGxlPgogIDxyZWN0IHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0ibm9uZSIvPgoKICA8IS0tIGhhbG8gLS0+CiAgPHBhdGggZD0iTTUgMWg2djFoMnYxaC0yVjJINXYxSDNWMmgyeiIgZmlsbD0iIzUyYjhmZiIvPgogIDxwYXRoIGQ9Ik01IDJoNnYxSDV6IiBmaWxsPSIjZGZmNmZmIi8+CgogIDwhLS0gaGFpciBzaWxob3VldHRlIC0tPgogIDxwYXRoIGQ9Ik00IDRoMVYzaDZ2MWgxdjFoMXY2aC0xdjJoLTF2MUg1di0xSDR2LTJIM1Y1aDF6IiBmaWxsPSIjMjYzMjU1Ii8+CiAgPHBhdGggZD0iTTUgM2g2djFoMXY3aC0xdjJINXYtMkg0VjVoMXoiIGZpbGw9IiNmMWY4ZmYiLz4KCiAgPCEtLSBibHVlIHNoYWRvd3MgLS0+CiAgPHBhdGggZD0iTTQgNmgxdjVINHpNMTEgNWgxdjZoLTF6TTUgMTJoMnYxSDV6TTkgMTJoMnYxSDl6IiBmaWxsPSIjOWZiOGU4Ii8+CiAgPHBhdGggZD0iTTYgNGgxdjRINnpNOSA0aDF2NEg5eiIgZmlsbD0iI2M3ZDhmZiIvPgoKICA8IS0tIGhhaXIgYWNjZXNzb3J5IC0tPgogIDxwYXRoIGQ9Ik0xMiA0aDJ2MWgxdjNoLTF2MWgtMlY4aC0xVjVoMXoiIGZpbGw9IiMyMDI5NGEiLz4KICA8cGF0aCBkPSJNMTMgNWgxdjFoMXYxaC0xdjFoLTFWN2gtMVY2aDF6IiBmaWxsPSIjMzViOWZmIi8+CgogIDwhLS0gZmFjZSAtLT4KICA8cGF0aCBkPSJNNSA4aDZ2M2gtMXYxSDZ2LTFINXoiIGZpbGw9IiNmZmU2ZDIiLz4KICA8cGF0aCBkPSJNNSAxMGgxdjFINXpNMTAgMTBoMXYxaC0xeiIgZmlsbD0iI2ZmYjNiOSIvPgoKICA8IS0tIGV5ZXMgLS0+CiAgPHBhdGggZD0iTTYgOGgydjJINnpNOSA4aDJ2Mkg5eiIgZmlsbD0iIzE4MzY2ZiIvPgogIDxwYXRoIGQ9Ik03IDhoMXYxSDd6TTEwIDhoMXYxaC0xeiIgZmlsbD0iIzU0YzdmZiIvPgogIDxwYXRoIGQ9Ik03IDloMXYxSDd6TTEwIDloMXYxaC0xeiIgZmlsbD0iI2ZmZmZmZiIvPgoKICA8IS0tIG1vdXRoIC0tPgogIDxwYXRoIGQ9Ik03IDExaDJ2MUg3eiIgZmlsbD0iI2VjNmY4ZiIvPgoKICA8IS0tIGNvbGxhciAtLT4KICA8cGF0aCBkPSJNNiAxM2g0djFoMXYxSDV2LTFoMXoiIGZpbGw9IiMyNTM0NWUiLz4KICA8cGF0aCBkPSJNNyAxM2gydjFIN3oiIGZpbGw9IiM3OWQ3ZmYiLz4KPC9zdmc+Cg==
 // @match      https://share.dmhy.org/*
 // @match      https://dmhy.anoneko.com/*
 // @grant      GM_addStyle
@@ -318,6 +319,24 @@
       <svg class="amc-float-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
       </svg>
+      <svg class="amc-float-mascot" width="16" height="16" viewBox="0 0 16 16" style="display:none">
+        <path d="M5 1h6v1h2v1h-2V2H5v1H3V2h2z" fill="#52b8ff"/>
+        <path d="M5 2h6v1H5z" fill="#dff6ff"/>
+        <path d="M4 4h1V3h6v1h1v1h1v6h-1v2h-1v1H5v-1H4v-2H3V5h1z" fill="#263255"/>
+        <path d="M5 3h6v1h1v7h-1v2H5v-2H4V5h1z" fill="#f1f8ff"/>
+        <path d="M4 6h1v5H4zM11 5h1v6h-1zM5 12h2v1H5zM9 12h2v1H9z" fill="#9fb8e8"/>
+        <path d="M6 4h1v4H6zM9 4h1v4H9z" fill="#c7d8ff"/>
+        <path d="M12 4h2v1h1v3h-1v1h-2V8h-1V5h1z" fill="#20294a"/>
+        <path d="M13 5h1v1h1v1h-1v1h-1V7h-1V6h1z" fill="#35b9ff"/>
+        <path d="M5 8h6v3h-1v1H6v-1H5z" fill="#ffe6d2"/>
+        <path d="M5 10h1v1H5zM10 10h1v1h-1z" fill="#ffb3b9"/>
+        <path d="M6 8h2v2H6zM9 8h2v2H9z" fill="#18366f"/>
+        <path d="M7 8h1v1H7zM10 8h1v1h-1z" fill="#54c7ff"/>
+        <path d="M7 9h1v1H7zM10 9h1v1h-1z" fill="#ffffff"/>
+        <path d="M7 11h2v1H7z" fill="#ec6f8f"/>
+        <path d="M6 13h4v1h1v1H5v-1h1z" fill="#25345e"/>
+        <path d="M7 13h2v1H7z" fill="#79d7ff"/>
+      </svg>
     </div>
     <div class="amc-float-content">
       <span class="amc-float-count"><span id="amc-count">0</span> 项</span>
@@ -371,12 +390,18 @@
     }
     function toggleCollapse() {
       const isCollapsed = panel.classList.contains("amc-float-collapsed");
+      const dotsIcon = handle.querySelector(".amc-float-icon");
+      const mascotIcon = handle.querySelector(".amc-float-mascot");
       if (isCollapsed) {
         panel.classList.remove("amc-float-collapsed");
         handle.title = "拖动或点击折叠";
+        dotsIcon.style.display = "";
+        mascotIcon.style.display = "none";
       } else {
         panel.classList.add("amc-float-collapsed");
         handle.title = "点击展开";
+        dotsIcon.style.display = "none";
+        mascotIcon.style.display = "";
       }
     }
     let isDragging = false;
