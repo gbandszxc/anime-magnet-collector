@@ -9,7 +9,9 @@ const projectRoot = path.resolve(__dirname, "..");
 const distPath = path.join(projectRoot, "dist", "anime-magnet-collector.user.js");
 const packageJsonPath = path.join(projectRoot, "package.json");
 
-// 先重新构建，确保产物最新
+const distContentBeforeBuild = await readFile(distPath, "utf8");
+
+// 重新构建后比较内容，确保已提交/待提交产物确实来自当前源码。
 execFileSync(process.execPath, [path.join(projectRoot, "scripts", "build.mjs")], {
   cwd: projectRoot,
   stdio: "inherit"
@@ -28,13 +30,8 @@ if (distContent.includes("@require") || distContent.includes("@resource")) {
   throw new Error("dist 产物仍包含外部依赖 metadata（@require/@resource），请改为内联");
 }
 
-// 校验 3：git diff 确认产物与源码构建结果一致
-try {
-  execFileSync("git", ["diff", "--ignore-cr-at-eol", "--quiet", "--", `dist/anime-magnet-collector.user.js`], {
-    cwd: projectRoot,
-    stdio: "ignore"
-  });
-} catch {
+// 校验 3：构建前后内容一致，确认 dist 与当前源码构建结果一致
+if (distContentBeforeBuild.replace(/\r\n/g, "\n") !== distContent.replace(/\r\n/g, "\n")) {
   throw new Error("dist 产物与当前源码生成结果不一致，请重新构建并提交最新产物");
 }
 

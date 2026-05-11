@@ -398,43 +398,115 @@
       dragOffsetY: 0,
       snapped: "left"
     };
-    const edgeMargin = 16;
     function getDefaultPosition() {
-      return { x: edgeMargin, y: edgeMargin };
+      return { x: 16, y: 16 };
     }
     function initPosition() {
       const pos = getDefaultPosition();
       panel.style.left = `${pos.x}px`;
       panel.style.top = `${pos.y}px`;
       panel.style.right = "auto";
-      state.snapped = "left";
+      panel.style.bottom = "auto";
+      state.snapped = null;
     }
-    function snapToEdge(mouseX) {
-      const viewportWidth = window.innerWidth;
-      if (mouseX < viewportWidth / 2) {
-        panel.style.left = `${edgeMargin}px`;
-        panel.style.right = "auto";
-        state.snapped = "left";
+    function getPanelSize() {
+      const rect = panel.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    }
+    function getVisibleBounds() {
+      const { width, height } = getPanelSize();
+      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      return {
+        minX: 0,
+        maxX: Math.max(0, viewportWidth - width),
+        minY: 0,
+        maxY: Math.max(0, viewportHeight - height)
+      };
+    }
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+    function setPanelPosition(x, y, bounds = getVisibleBounds()) {
+      panel.style.left = `${clamp(x, bounds.minX, bounds.maxX)}px`;
+      panel.style.top = `${clamp(y, bounds.minY, bounds.maxY)}px`;
+      panel.style.right = "auto";
+      panel.style.bottom = "auto";
+    }
+    function keepPanelVisible() {
+      const rect = panel.getBoundingClientRect();
+      setPanelPosition(rect.left, rect.top);
+    }
+    function collapsePanel() {
+      const dotsIcon = handle.querySelector(".amc-float-icon");
+      const mascotIcon = handle.querySelector(".amc-float-mascot");
+      panel.classList.add("amc-float-collapsed");
+      handle.title = "点击展开";
+      dotsIcon.style.display = "none";
+      mascotIcon.style.display = "";
+    }
+    function expandPanel() {
+      const dotsIcon = handle.querySelector(".amc-float-icon");
+      const mascotIcon = handle.querySelector(".amc-float-mascot");
+      panel.classList.remove("amc-float-collapsed");
+      handle.title = "拖动或点击折叠";
+      dotsIcon.style.display = "";
+      mascotIcon.style.display = "none";
+    }
+    function applySnap(edge) {
+      const { width, height } = getPanelSize();
+      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      const halfVisibleBounds = {
+        minX: -width / 2,
+        maxX: viewportWidth - width / 2,
+        minY: -height / 2,
+        maxY: viewportHeight - height / 2
+      };
+      const rect = panel.getBoundingClientRect();
+      const currentX = rect.left;
+      const currentY = rect.top;
+      if (edge === "left") {
+        setPanelPosition(halfVisibleBounds.minX, currentY, halfVisibleBounds);
+      } else if (edge === "right") {
+        setPanelPosition(halfVisibleBounds.maxX, currentY, halfVisibleBounds);
+      } else if (edge === "top") {
+        setPanelPosition(currentX, halfVisibleBounds.minY, halfVisibleBounds);
       } else {
-        panel.style.left = "auto";
-        panel.style.right = `${edgeMargin}px`;
-        state.snapped = "right";
+        setPanelPosition(currentX, halfVisibleBounds.maxY, halfVisibleBounds);
       }
+      state.snapped = edge;
+    }
+    function getTouchedEdge() {
+      const rect = panel.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      const edgeThreshold = 8;
+      if (rect.left <= edgeThreshold) return "left";
+      if (viewportWidth - rect.right <= edgeThreshold) return "right";
+      if (rect.top <= edgeThreshold) return "top";
+      if (viewportHeight - rect.bottom <= edgeThreshold) return "bottom";
+      return null;
+    }
+    function collapseIfTouchingEdge() {
+      const touchedEdge = getTouchedEdge();
+      if (!touchedEdge) {
+        state.snapped = null;
+        keepPanelVisible();
+        return;
+      }
+      collapsePanel();
+      requestAnimationFrame(() => applySnap(touchedEdge));
     }
     function toggleCollapse() {
       const isCollapsed = panel.classList.contains("amc-float-collapsed");
-      const dotsIcon = handle.querySelector(".amc-float-icon");
-      const mascotIcon = handle.querySelector(".amc-float-mascot");
       if (isCollapsed) {
-        panel.classList.remove("amc-float-collapsed");
-        handle.title = "拖动或点击折叠";
-        dotsIcon.style.display = "";
-        mascotIcon.style.display = "none";
+        expandPanel();
+        state.snapped = null;
+        requestAnimationFrame(keepPanelVisible);
       } else {
-        panel.classList.add("amc-float-collapsed");
-        handle.title = "点击展开";
-        dotsIcon.style.display = "none";
-        mascotIcon.style.display = "";
+        collapsePanel();
+        requestAnimationFrame(keepPanelVisible);
       }
     }
     let isDragging = false;
@@ -447,15 +519,14 @@
       const dy = e.clientY - startY;
       if (!state.dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
         state.dragging = true;
+        hasMoved = true;
         panel.classList.add("amc-float-dragging");
         const rect = panel.getBoundingClientRect();
         state.dragOffsetX = e.clientX - rect.left;
         state.dragOffsetY = e.clientY - rect.top;
       }
       if (state.dragging) {
-        panel.style.left = `${e.clientX - state.dragOffsetX}px`;
-        panel.style.top = `${e.clientY - state.dragOffsetY}px`;
-        panel.style.right = "auto";
+        setPanelPosition(e.clientX - state.dragOffsetX, e.clientY - state.dragOffsetY);
         state.snapped = null;
       }
     };
@@ -464,10 +535,9 @@
         if (state.dragging) {
           state.dragging = false;
           panel.classList.remove("amc-float-dragging");
-          snapToEdge(e.clientX);
+          collapseIfTouchingEdge();
         }
         isDragging = false;
-        hasMoved = false;
       }
     };
     handle.addEventListener("mousedown", (e) => {
@@ -489,6 +559,12 @@
       state.dragging = false;
       hasMoved = false;
     });
+    panel.addEventListener("click", (e) => {
+      if (e.target.closest(".amc-float-handle")) return;
+      if (!panel.classList.contains("amc-float-collapsed")) return;
+      if (state.dragging || hasMoved) return;
+      toggleCollapse();
+    });
     handle.addEventListener("touchstart", (e) => {
       if (e.target.closest(".amc-float-btn")) return;
       e.preventDefault();
@@ -506,15 +582,14 @@
       const dy = touch.clientY - startY;
       if (!state.dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
         state.dragging = true;
+        hasMoved = true;
         panel.classList.add("amc-float-dragging");
         const rect = panel.getBoundingClientRect();
         state.dragOffsetX = touch.clientX - rect.left;
         state.dragOffsetY = touch.clientY - rect.top;
       }
       if (state.dragging) {
-        panel.style.left = `${touch.clientX - state.dragOffsetX}px`;
-        panel.style.top = `${touch.clientY - state.dragOffsetY}px`;
-        panel.style.right = "auto";
+        setPanelPosition(touch.clientX - state.dragOffsetX, touch.clientY - state.dragOffsetY);
         state.snapped = null;
       }
     }, { passive: false });
@@ -523,8 +598,7 @@
         if (state.dragging) {
           state.dragging = false;
           panel.classList.remove("amc-float-dragging");
-          const touch = e.changedTouches[0];
-          snapToEdge(touch.clientX);
+          collapseIfTouchingEdge();
         }
         isDragging = false;
       }
@@ -534,12 +608,10 @@
       toggleCollapse();
     });
     function onResize() {
-      if (state.snapped === "left") {
-        panel.style.left = `${edgeMargin}px`;
-        panel.style.right = "auto";
-      } else if (state.snapped === "right") {
-        panel.style.left = "auto";
-        panel.style.right = `${edgeMargin}px`;
+      if (state.snapped) {
+        applySnap(state.snapped);
+      } else {
+        keepPanelVisible();
       }
     }
     window.addEventListener("resize", onResize);
