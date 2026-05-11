@@ -77,7 +77,8 @@
   font-size: var(--amc-font-size-sm);
   user-select: none;
   cursor: default;
-  transition: box-shadow var(--amc-duration-normal) var(--amc-ease-out);
+  transition: box-shadow var(--amc-duration-normal) var(--amc-ease-out),
+              padding var(--amc-duration-normal) var(--amc-ease-out);
 }
 
 #amc-float:hover {
@@ -87,6 +88,15 @@
 #amc-float.amc-float-dragging {
   box-shadow: var(--amc-shadow-lg);
   cursor: grabbing;
+}
+
+/* Collapsed state - only handle visible */
+#amc-float.amc-float-collapsed {
+  padding: 6px;
+}
+
+#amc-float.amc-float-collapsed .amc-float-content {
+  display: none;
 }
 
 .amc-float-handle {

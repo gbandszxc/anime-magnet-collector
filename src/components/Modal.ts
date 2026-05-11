@@ -1,5 +1,6 @@
 import { selectionStore } from "./SelectionStore";
 import { findAdapter } from "../sites/index";
+import type { MagnetItem } from "../sites/types";
 import { copyMagnetsToClipboard, formatTitle } from "../utils/magnet";
 
 let modalEl: HTMLDivElement | null = null;
@@ -41,7 +42,7 @@ export function openModal(): void {
       </div>
       <div class="amc-modal-footer">
         <button id="amc-copy-long" class="amc-float-btn">复制长链</button>
-        <button id="amc-copy-short" class="amc-float-btn" disabled title="该站点暂不支持短链">复制短链(暂不可用)</button>
+        <button id="amc-copy-short" class="amc-float-btn">复制短链</button>
         <button id="amc-cancel" class="amc-float-btn">取消</button>
       </div>
     </div>
@@ -49,10 +50,28 @@ export function openModal(): void {
 
   document.body.appendChild(modalEl);
 
+  // 检查是否支持短链
+  const canBuildShort = adapter.buildShortMagnet != null;
+  const shortBtn = modalEl.querySelector<HTMLButtonElement>("#amc-copy-short")!;
+  if (!canBuildShort) {
+    shortBtn.disabled = true;
+    shortBtn.title = "该站点暂不支持短链";
+  }
+
   // 事件绑定
   modalEl.querySelector<HTMLButtonElement>("#amc-copy-long")!.onclick = async () => {
     const count = await copyMagnetsToClipboard(selectedItems);
     showToast(`已复制 ${count} 条磁力链`);
+    closeModal();
+  };
+
+  shortBtn.onclick = async () => {
+    const shortItems = selectedItems.map(item => {
+      const short = adapter.buildShortMagnet?.(item.magnet);
+      return short ?? item.magnet;
+    });
+    const count = await copyMagnetsToClipboard(shortItems.map(m => ({ magnet: m } as MagnetItem)));
+    showToast(`已复制 ${count} 条短链`);
     closeModal();
   };
 

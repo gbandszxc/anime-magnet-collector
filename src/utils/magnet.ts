@@ -9,6 +9,16 @@ export function extractInfoHash(magnet: string): string | null {
 }
 
 /**
+ * 从长链生成短链（只有 xt=urn:btih:INFOHASH）
+ * 长链包含完整信息，短链只保留核心 infohash
+ */
+export function buildShortMagnet(magnet: string): string | null {
+  const infoHash = extractInfoHash(magnet);
+  if (!infoHash) return null;
+  return `magnet:?xt=urn:btih:${infoHash}`;
+}
+
+/**
  * 复制磁力链列表到剪贴板，每行一个
  */
 export async function copyMagnetsToClipboard(items: MagnetItem[]): Promise<number> {

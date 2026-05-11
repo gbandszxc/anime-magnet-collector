@@ -16,7 +16,7 @@
 "use strict";
 (() => {
   // src/style.css
-  var style_default = "/* ========================\n   Anime Magnet Collector\n   ======================== */\n\n/* Design Tokens */\n:root {\n  /* Color */\n  --amc-bg: rgba(255, 255, 255, 0.95);\n  --amc-bg-solid: #ffffff;\n  --amc-bg-disabled: rgba(0, 0, 0, 0.08);\n  --amc-bg-overlay: rgba(0, 0, 0, 0.5);\n\n  --amc-text-primary: #333333;\n  --amc-text-secondary: #666666;\n  --amc-text-muted: #999999;\n  --amc-text-disabled: #aaaaaa;\n  --amc-text-inverse: #ffffff;\n\n  --amc-accent: #4CAF50;\n  --amc-accent-hover: #43a047;\n\n  --amc-border: rgba(0, 0, 0, 0.1);\n  --amc-border-hover: rgba(0, 0, 0, 0.15);\n\n  /* Shadow */\n  --amc-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);\n  --amc-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);\n  --amc-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);\n\n  /* Spacing */\n  --amc-space-xs: 4px;\n  --amc-space-sm: 8px;\n  --amc-space-md: 12px;\n  --amc-space-lg: 16px;\n  --amc-space-xl: 20px;\n\n  /* Radius */\n  --amc-radius-sm: 4px;\n  --amc-radius-md: 8px;\n  --amc-radius-pill: 999px;\n\n  /* Typography */\n  --amc-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n  --amc-font-size-sm: 13px;\n  --amc-font-size-md: 14px;\n  --amc-font-size-lg: 16px;\n  --amc-font-weight-medium: 500;\n  --amc-font-weight-semibold: 600;\n  --amc-font-weight-bold: 700;\n\n  /* Motion */\n  --amc-duration-fast: 0.15s;\n  --amc-duration-normal: 0.2s;\n  --amc-ease-out: ease-out;\n\n  /* Z-Index */\n  --amc-z-float: 2147483647;\n}\n\n/* Floating Panel */\n#amc-float {\n  position: fixed;\n  z-index: var(--amc-z-float);\n  top: var(--amc-space-lg);\n  left: var(--amc-space-lg);\n  display: flex;\n  align-items: center;\n  gap: 2px;\n  background: var(--amc-bg);\n  backdrop-filter: blur(12px);\n  -webkit-backdrop-filter: blur(12px);\n  border: 1px solid var(--amc-border);\n  border-radius: var(--amc-radius-pill);\n  padding: 6px 12px 6px 8px;\n  box-shadow: var(--amc-shadow-md);\n  font-family: var(--amc-font-family);\n  font-size: var(--amc-font-size-sm);\n  user-select: none;\n  cursor: default;\n  transition: box-shadow var(--amc-duration-normal) var(--amc-ease-out);\n}\n\n#amc-float:hover {\n  box-shadow: var(--amc-shadow-lg);\n}\n\n#amc-float.amc-float-dragging {\n  box-shadow: var(--amc-shadow-lg);\n  cursor: grabbing;\n}\n\n.amc-float-handle {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  color: var(--amc-text-muted);\n  cursor: grab;\n  border-radius: 50%;\n  transition: color var(--amc-duration-fast) var(--amc-ease-out),\n              background var(--amc-duration-fast) var(--amc-ease-out);\n}\n\n.amc-float-handle:hover {\n  color: var(--amc-text-secondary);\n  background: rgba(0, 0, 0, 0.05);\n}\n\n.amc-float-dragging .amc-float-handle {\n  cursor: grabbing;\n}\n\n.amc-float-content {\n  display: flex;\n  align-items: center;\n  gap: var(--amc-space-md);\n}\n\n.amc-float-count {\n  color: var(--amc-text-primary);\n  font-weight: var(--amc-font-weight-medium);\n  white-space: nowrap;\n}\n\n.amc-float-count span {\n  color: var(--amc-accent);\n  font-weight: var(--amc-font-weight-bold);\n}\n\n.amc-float-btn {\n  padding: 5px 14px;\n  border-radius: var(--amc-radius-pill);\n  border: none;\n  font-size: var(--amc-font-size-sm);\n  font-weight: var(--amc-font-weight-semibold);\n  cursor: pointer;\n  transition: background var(--amc-duration-fast) var(--amc-ease-out),\n              transform var(--amc-duration-fast) var(--amc-ease-out);\n}\n\n.amc-float-btn:not(:disabled) {\n  background: var(--amc-accent);\n  color: var(--amc-text-inverse);\n}\n\n.amc-float-btn:not(:disabled):hover {\n  background: var(--amc-accent-hover);\n  transform: scale(1.02);\n}\n\n.amc-float-btn:disabled {\n  background: var(--amc-bg-disabled);\n  color: var(--amc-text-disabled);\n  cursor: not-allowed;\n}\n\n/* Modal Overlay */\n.amc-modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: var(--amc-bg-overlay);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: var(--amc-z-float);\n  font-family: var(--amc-font-family);\n}\n\n/* Modal */\n.amc-modal {\n  background: var(--amc-bg-solid);\n  border-radius: var(--amc-radius-md);\n  box-shadow: var(--amc-shadow-lg);\n  width: 90%;\n  max-width: 500px;\n  max-height: 80vh;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  animation: amc-modal-enter var(--amc-duration-normal) var(--amc-ease-out);\n}\n\n.amc-modal-header {\n  padding: var(--amc-space-lg) var(--amc-space-xl);\n  font-size: var(--amc-font-size-lg);\n  font-weight: var(--amc-font-weight-semibold);\n  border-bottom: 1px solid var(--amc-border);\n  color: var(--amc-text-primary);\n}\n\n.amc-modal-list {\n  padding: var(--amc-space-md) var(--amc-space-xl);\n  overflow-y: auto;\n  flex: 1;\n}\n\n.amc-modal-item {\n  display: flex;\n  padding: var(--amc-space-xs) 0;\n  font-size: var(--amc-font-size-md);\n  color: var(--amc-text-primary);\n}\n\n.amc-modal-num {\n  color: var(--amc-text-muted);\n  margin-right: var(--amc-space-sm);\n  min-width: 24px;\n}\n\n.amc-modal-title {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.amc-modal-footer {\n  padding: var(--amc-space-lg) var(--amc-space-xl);\n  border-top: 1px solid var(--amc-border);\n  display: flex;\n  gap: var(--amc-space-sm);\n  justify-content: flex-end;\n}\n\n/* Toast */\n.amc-toast {\n  position: fixed;\n  bottom: var(--amc-space-xl);\n  left: 50%;\n  transform: translateX(-50%);\n  background: var(--amc-text-primary);\n  color: var(--amc-text-inverse);\n  padding: 10px 20px;\n  border-radius: var(--amc-radius-pill);\n  font-size: var(--amc-font-size-md);\n  z-index: var(--amc-z-float);\n  font-family: var(--amc-font-family);\n  animation: amc-fade-in var(--amc-duration-normal) var(--amc-ease-out);\n}\n\n/* Checkbox Column */\n.amc-checkbox-col {\n  padding: var(--amc-space-xs) !important;\n}\n\n.amc-checkbox-row,\n.amc-checkbox-header {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Animations */\n@keyframes amc-fade-in {\n  from {\n    opacity: 0;\n    transform: translateX(-50%) translateY(10px);\n  }\n  to {\n    opacity: 1;\n    transform: translateX(-50%) translateY(0);\n  }\n}\n\n/* Modal animation - center origin */\n@keyframes amc-modal-enter {\n  from {\n    opacity: 0;\n    transform: scale(0.95) translateY(-10px);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1) translateY(0);\n  }\n}\n";
+  var style_default = "/* ========================\n   Anime Magnet Collector\n   ======================== */\n\n/* Design Tokens */\n:root {\n  /* Color */\n  --amc-bg: rgba(255, 255, 255, 0.95);\n  --amc-bg-solid: #ffffff;\n  --amc-bg-disabled: rgba(0, 0, 0, 0.08);\n  --amc-bg-overlay: rgba(0, 0, 0, 0.5);\n\n  --amc-text-primary: #333333;\n  --amc-text-secondary: #666666;\n  --amc-text-muted: #999999;\n  --amc-text-disabled: #aaaaaa;\n  --amc-text-inverse: #ffffff;\n\n  --amc-accent: #4CAF50;\n  --amc-accent-hover: #43a047;\n\n  --amc-border: rgba(0, 0, 0, 0.1);\n  --amc-border-hover: rgba(0, 0, 0, 0.15);\n\n  /* Shadow */\n  --amc-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);\n  --amc-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);\n  --amc-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);\n\n  /* Spacing */\n  --amc-space-xs: 4px;\n  --amc-space-sm: 8px;\n  --amc-space-md: 12px;\n  --amc-space-lg: 16px;\n  --amc-space-xl: 20px;\n\n  /* Radius */\n  --amc-radius-sm: 4px;\n  --amc-radius-md: 8px;\n  --amc-radius-pill: 999px;\n\n  /* Typography */\n  --amc-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n  --amc-font-size-sm: 13px;\n  --amc-font-size-md: 14px;\n  --amc-font-size-lg: 16px;\n  --amc-font-weight-medium: 500;\n  --amc-font-weight-semibold: 600;\n  --amc-font-weight-bold: 700;\n\n  /* Motion */\n  --amc-duration-fast: 0.15s;\n  --amc-duration-normal: 0.2s;\n  --amc-ease-out: ease-out;\n\n  /* Z-Index */\n  --amc-z-float: 2147483647;\n}\n\n/* Floating Panel */\n#amc-float {\n  position: fixed;\n  z-index: var(--amc-z-float);\n  top: var(--amc-space-lg);\n  left: var(--amc-space-lg);\n  display: flex;\n  align-items: center;\n  gap: 2px;\n  background: var(--amc-bg);\n  backdrop-filter: blur(12px);\n  -webkit-backdrop-filter: blur(12px);\n  border: 1px solid var(--amc-border);\n  border-radius: var(--amc-radius-pill);\n  padding: 6px 12px 6px 8px;\n  box-shadow: var(--amc-shadow-md);\n  font-family: var(--amc-font-family);\n  font-size: var(--amc-font-size-sm);\n  user-select: none;\n  cursor: default;\n  transition: box-shadow var(--amc-duration-normal) var(--amc-ease-out),\n              padding var(--amc-duration-normal) var(--amc-ease-out);\n}\n\n#amc-float:hover {\n  box-shadow: var(--amc-shadow-lg);\n}\n\n#amc-float.amc-float-dragging {\n  box-shadow: var(--amc-shadow-lg);\n  cursor: grabbing;\n}\n\n/* Collapsed state - only handle visible */\n#amc-float.amc-float-collapsed {\n  padding: 6px;\n}\n\n#amc-float.amc-float-collapsed .amc-float-content {\n  display: none;\n}\n\n.amc-float-handle {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  color: var(--amc-text-muted);\n  cursor: grab;\n  border-radius: 50%;\n  transition: color var(--amc-duration-fast) var(--amc-ease-out),\n              background var(--amc-duration-fast) var(--amc-ease-out);\n}\n\n.amc-float-handle:hover {\n  color: var(--amc-text-secondary);\n  background: rgba(0, 0, 0, 0.05);\n}\n\n.amc-float-dragging .amc-float-handle {\n  cursor: grabbing;\n}\n\n.amc-float-content {\n  display: flex;\n  align-items: center;\n  gap: var(--amc-space-md);\n}\n\n.amc-float-count {\n  color: var(--amc-text-primary);\n  font-weight: var(--amc-font-weight-medium);\n  white-space: nowrap;\n}\n\n.amc-float-count span {\n  color: var(--amc-accent);\n  font-weight: var(--amc-font-weight-bold);\n}\n\n.amc-float-btn {\n  padding: 5px 14px;\n  border-radius: var(--amc-radius-pill);\n  border: none;\n  font-size: var(--amc-font-size-sm);\n  font-weight: var(--amc-font-weight-semibold);\n  cursor: pointer;\n  transition: background var(--amc-duration-fast) var(--amc-ease-out),\n              transform var(--amc-duration-fast) var(--amc-ease-out);\n}\n\n.amc-float-btn:not(:disabled) {\n  background: var(--amc-accent);\n  color: var(--amc-text-inverse);\n}\n\n.amc-float-btn:not(:disabled):hover {\n  background: var(--amc-accent-hover);\n  transform: scale(1.02);\n}\n\n.amc-float-btn:disabled {\n  background: var(--amc-bg-disabled);\n  color: var(--amc-text-disabled);\n  cursor: not-allowed;\n}\n\n/* Modal Overlay */\n.amc-modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: var(--amc-bg-overlay);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: var(--amc-z-float);\n  font-family: var(--amc-font-family);\n}\n\n/* Modal */\n.amc-modal {\n  background: var(--amc-bg-solid);\n  border-radius: var(--amc-radius-md);\n  box-shadow: var(--amc-shadow-lg);\n  width: 90%;\n  max-width: 500px;\n  max-height: 80vh;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  animation: amc-modal-enter var(--amc-duration-normal) var(--amc-ease-out);\n}\n\n.amc-modal-header {\n  padding: var(--amc-space-lg) var(--amc-space-xl);\n  font-size: var(--amc-font-size-lg);\n  font-weight: var(--amc-font-weight-semibold);\n  border-bottom: 1px solid var(--amc-border);\n  color: var(--amc-text-primary);\n}\n\n.amc-modal-list {\n  padding: var(--amc-space-md) var(--amc-space-xl);\n  overflow-y: auto;\n  flex: 1;\n}\n\n.amc-modal-item {\n  display: flex;\n  padding: var(--amc-space-xs) 0;\n  font-size: var(--amc-font-size-md);\n  color: var(--amc-text-primary);\n}\n\n.amc-modal-num {\n  color: var(--amc-text-muted);\n  margin-right: var(--amc-space-sm);\n  min-width: 24px;\n}\n\n.amc-modal-title {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.amc-modal-footer {\n  padding: var(--amc-space-lg) var(--amc-space-xl);\n  border-top: 1px solid var(--amc-border);\n  display: flex;\n  gap: var(--amc-space-sm);\n  justify-content: flex-end;\n}\n\n/* Toast */\n.amc-toast {\n  position: fixed;\n  bottom: var(--amc-space-xl);\n  left: 50%;\n  transform: translateX(-50%);\n  background: var(--amc-text-primary);\n  color: var(--amc-text-inverse);\n  padding: 10px 20px;\n  border-radius: var(--amc-radius-pill);\n  font-size: var(--amc-font-size-md);\n  z-index: var(--amc-z-float);\n  font-family: var(--amc-font-family);\n  animation: amc-fade-in var(--amc-duration-normal) var(--amc-ease-out);\n}\n\n/* Checkbox Column */\n.amc-checkbox-col {\n  padding: var(--amc-space-xs) !important;\n}\n\n.amc-checkbox-row,\n.amc-checkbox-header {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Animations */\n@keyframes amc-fade-in {\n  from {\n    opacity: 0;\n    transform: translateX(-50%) translateY(10px);\n  }\n  to {\n    opacity: 1;\n    transform: translateX(-50%) translateY(0);\n  }\n}\n\n/* Modal animation - center origin */\n@keyframes amc-modal-enter {\n  from {\n    opacity: 0;\n    transform: scale(0.95) translateY(-10px);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1) translateY(0);\n  }\n}\n";
 
   // src/config.ts
   var CONFIG = {
@@ -29,6 +29,27 @@
       if (config.debug) console.log("[Anime Magnet Collector]", ...args);
     }
     return { log: log2 };
+  }
+
+  // src/utils/magnet.ts
+  function extractInfoHash(magnet) {
+    const match = magnet.match(/btih:([^&]+)/i);
+    return match ? match[1].toUpperCase() : null;
+  }
+  function buildShortMagnet(magnet) {
+    const infoHash = extractInfoHash(magnet);
+    if (!infoHash) return null;
+    return `magnet:?xt=urn:btih:${infoHash}`;
+  }
+  async function copyMagnetsToClipboard(items) {
+    const text = items.map((item) => item.magnet).join("\n");
+    await navigator.clipboard.writeText(text);
+    return items.length;
+  }
+  function formatTitle(title, maxLen = 40) {
+    const cleaned = title.replace(/\s+/g, " ").trim();
+    if (cleaned.length <= maxLen) return cleaned;
+    return cleaned.substring(0, maxLen - 3) + "...";
   }
 
   // src/sites/dmhy.ts
@@ -53,7 +74,7 @@
       return cell.textContent?.trim().replace(/\s+/g, " ") ?? "";
     },
     buildShortMagnet(magnet) {
-      return null;
+      return buildShortMagnet(magnet);
     }
   };
 
@@ -208,18 +229,6 @@
     });
   }
 
-  // src/utils/magnet.ts
-  async function copyMagnetsToClipboard(items) {
-    const text = items.map((item) => item.magnet).join("\n");
-    await navigator.clipboard.writeText(text);
-    return items.length;
-  }
-  function formatTitle(title, maxLen = 40) {
-    const cleaned = title.replace(/\s+/g, " ").trim();
-    if (cleaned.length <= maxLen) return cleaned;
-    return cleaned.substring(0, maxLen - 3) + "...";
-  }
-
   // src/components/Modal.ts
   var modalEl = null;
   function openModal() {
@@ -255,15 +264,30 @@
       </div>
       <div class="amc-modal-footer">
         <button id="amc-copy-long" class="amc-float-btn">复制长链</button>
-        <button id="amc-copy-short" class="amc-float-btn" disabled title="该站点暂不支持短链">复制短链(暂不可用)</button>
+        <button id="amc-copy-short" class="amc-float-btn">复制短链</button>
         <button id="amc-cancel" class="amc-float-btn">取消</button>
       </div>
     </div>
   `;
     document.body.appendChild(modalEl);
+    const canBuildShort = adapter.buildShortMagnet != null;
+    const shortBtn = modalEl.querySelector("#amc-copy-short");
+    if (!canBuildShort) {
+      shortBtn.disabled = true;
+      shortBtn.title = "该站点暂不支持短链";
+    }
     modalEl.querySelector("#amc-copy-long").onclick = async () => {
       const count = await copyMagnetsToClipboard(selectedItems);
       showToast(`已复制 ${count} 条磁力链`);
+      closeModal();
+    };
+    shortBtn.onclick = async () => {
+      const shortItems = selectedItems.map((item) => {
+        const short = adapter.buildShortMagnet?.(item.magnet);
+        return short ?? item.magnet;
+      });
+      const count = await copyMagnetsToClipboard(shortItems.map((m) => ({ magnet: m })));
+      showToast(`已复制 ${count} 条短链`);
       closeModal();
     };
     modalEl.querySelector("#amc-cancel").onclick = closeModal;
@@ -290,8 +314,8 @@
     const toolbar = document.createElement("div");
     toolbar.id = "amc-float";
     toolbar.innerHTML = `
-    <div class="amc-float-handle">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="amc-float-handle" title="收起">
+      <svg class="amc-float-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
       </svg>
     </div>
@@ -316,13 +340,15 @@
   }
   function initFloatPanel(panel) {
     const handle = panel.querySelector(".amc-float-handle");
+    const content = panel.querySelector(".amc-float-content");
     const state = {
       dragging: false,
       offset: { x: 0, y: 0 },
-      snapped: null
+      snapped: null,
+      collapsed: false
     };
-    const snapDistance = 10;
     const edgeMargin = 16;
+    const collapsedOffset = 40;
     function getDefaultPosition() {
       return { x: edgeMargin, y: edgeMargin };
     }
@@ -332,9 +358,10 @@
       panel.style.top = `${pos.y}px`;
       panel.style.right = "auto";
       state.snapped = "left";
+      state.collapsed = false;
+      panel.classList.remove("amc-float-collapsed");
     }
     function snapToEdge(mouseX) {
-      const panelRect = panel.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       if (mouseX < viewportWidth / 2) {
         panel.style.left = `${edgeMargin}px`;
@@ -344,6 +371,31 @@
         panel.style.left = "auto";
         panel.style.right = `${edgeMargin}px`;
         state.snapped = "right";
+      }
+    }
+    function toggleCollapse() {
+      const panelRect = panel.getBoundingClientRect();
+      const isCollapsed = panel.classList.contains("amc-float-collapsed");
+      if (isCollapsed) {
+        panel.classList.remove("amc-float-collapsed");
+        handle.title = "收起";
+        if (state.snapped === "left") {
+          panel.style.left = `${edgeMargin}px`;
+          panel.style.right = "auto";
+        } else {
+          panel.style.left = "auto";
+          panel.style.right = `${edgeMargin}px`;
+        }
+      } else {
+        panel.classList.add("amc-float-collapsed");
+        handle.title = "展开";
+        if (state.snapped === "left") {
+          panel.style.left = `${edgeMargin}px`;
+          panel.style.right = "auto";
+        } else {
+          panel.style.left = "auto";
+          panel.style.right = `${edgeMargin}px`;
+        }
       }
     }
     function onMouseDown(e) {
@@ -379,10 +431,20 @@
         panel.style.right = `${edgeMargin}px`;
       }
     }
-    handle.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-    window.addEventListener("resize", onResize);
+    let clickMoved = false;
+    handle.addEventListener("mousedown", () => {
+      clickMoved = false;
+    });
+    handle.addEventListener("mousemove", () => {
+      clickMoved = true;
+    });
+    handle.addEventListener("mouseup", (e) => {
+      if (!clickMoved) {
+        toggleCollapse();
+      } else {
+        clickMoved = false;
+      }
+    });
     handle.addEventListener("touchstart", (e) => {
       if (e.target.closest(".amc-float-btn")) return;
       e.preventDefault();
@@ -393,6 +455,9 @@
       state.offset.y = touch.clientY - rect.top;
       panel.classList.add("amc-float-dragging");
     }, { passive: false });
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("resize", onResize);
     document.addEventListener("touchmove", (e) => {
       if (!state.dragging) return;
       const touch = e.touches[0];
@@ -407,6 +472,10 @@
       panel.classList.remove("amc-float-dragging");
       const touch = e.changedTouches[0];
       snapToEdge(touch.clientX);
+    });
+    handle.addEventListener("dblclick", (e) => {
+      e.preventDefault();
+      toggleCollapse();
     });
     requestAnimationFrame(initPosition);
   }

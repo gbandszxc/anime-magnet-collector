@@ -1,4 +1,5 @@
 import type { SiteAdapter } from "./types";
+import { buildShortMagnet } from "../utils/magnet";
 
 export const dmhyAdapter: SiteAdapter = {
   siteId: "dmhy",
@@ -25,7 +26,6 @@ export const dmhyAdapter: SiteAdapter = {
   },
 
   buildShortMagnet(magnet: string): string | null {
-    // dmhy 暂无短链支持
-    return null;
+    return buildShortMagnet(magnet);
   }
 };
