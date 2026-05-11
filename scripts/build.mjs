@@ -1,5 +1,5 @@
 import path from "node:path";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { build, context } from "esbuild";
 
@@ -13,6 +13,21 @@ const distRelativePath = "dist/anime-magnet-collector.user.js";
 const rawDistUrl = "gbandszxc"
   ? `https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/${distRelativePath}`
   : null;
+
+// Sync version to README.md changelog
+async function syncReadmeVersion() {
+  const readmePath = path.join(projectRoot, "README.md");
+  const readme = await readFile(readmePath, "utf8");
+
+  // Find and replace the first changelog version header (### vX.X.X)
+  // This ensures README.md changelog always starts with current version
+  const updated = readme.replace(/^### v\d+\.\d+\.\d+/m, `### v${version}`);
+
+  if (updated !== readme) {
+    await writeFile(readmePath, updated, "utf8");
+    console.log(`README.md version synced to v${version}`);
+  }
+}
 
 const entryFile = path.join(projectRoot, "src", "main.ts");
 const outputFile = path.join(projectRoot, distRelativePath);
@@ -84,4 +99,5 @@ if (isWatchMode) {
 } else {
   await build(buildOptions);
   console.log(`Build completed: ${outputFile}`);
+  await syncReadmeVersion();
 }
