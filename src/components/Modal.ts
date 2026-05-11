@@ -1,7 +1,7 @@
 import { selectionStore } from "./SelectionStore";
 import { findAdapter } from "../sites/index";
 import type { MagnetItem } from "../sites/types";
-import { copyMagnetsToClipboard, formatTitle } from "../utils/magnet";
+import { copyMagnetsToClipboard, formatTitle, isLongMagnet } from "../utils/magnet";
 
 let modalEl: HTMLDivElement | null = null;
 
@@ -50,12 +50,22 @@ export function openModal(): void {
 
   document.body.appendChild(modalEl);
 
-  // 检查是否支持短链
-  const canBuildShort = adapter.buildShortMagnet != null;
+  const longBtn = modalEl.querySelector<HTMLButtonElement>("#amc-copy-long")!;
   const shortBtn = modalEl.querySelector<HTMLButtonElement>("#amc-copy-short")!;
-  if (!canBuildShort) {
+
+  // 根据选中磁链的实际情况判断长链/短链按钮可用性
+  // 长链按钮：所选全部为长链时才可用（短链无法还原成长链）
+  // 短链按钮：所选全部为短链时才可用（长链可生成短链）
+  const hasLong = selectedItems.some(item => isLongMagnet(item.magnet));
+  const hasShort = selectedItems.some(item => !isLongMagnet(item.magnet));
+
+  if (hasShort) {
+    longBtn.disabled = true;
+    longBtn.title = "所选包含短链，无法还原为长链";
+  }
+  if (!hasLong) {
     shortBtn.disabled = true;
-    shortBtn.title = "该站点暂不支持短链";
+    shortBtn.title = "所选均为短链，无需转换";
   }
 
   // 事件绑定

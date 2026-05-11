@@ -9,6 +9,13 @@ export function extractInfoHash(magnet: string): string | null {
 }
 
 /**
+ * 判断磁链是否为长链（包含额外参数如 tr、dn 等）
+ */
+export function isLongMagnet(magnet: string): boolean {
+  return /&(tr|dn|xl|xt)/.test(magnet);
+}
+
+/**
  * 从长链生成短链（只有 xt=urn:btih:INFOHASH）
  * 长链包含完整信息，短链只保留核心 infohash
  */

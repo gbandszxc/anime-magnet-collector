@@ -37,6 +37,9 @@
     const match = magnet.match(/btih:([^&]+)/i);
     return match ? match[1].toUpperCase() : null;
   }
+  function isLongMagnet(magnet) {
+    return /&(tr|dn|xl|xt)/.test(magnet);
+  }
   function buildShortMagnet(magnet) {
     const infoHash = extractInfoHash(magnet);
     if (!infoHash) return null;
@@ -271,11 +274,17 @@
     </div>
   `;
     document.body.appendChild(modalEl);
-    const canBuildShort = adapter.buildShortMagnet != null;
+    const longBtn = modalEl.querySelector("#amc-copy-long");
     const shortBtn = modalEl.querySelector("#amc-copy-short");
-    if (!canBuildShort) {
+    const hasLong = selectedItems.some((item) => isLongMagnet(item.magnet));
+    const hasShort = selectedItems.some((item) => !isLongMagnet(item.magnet));
+    if (hasShort) {
+      longBtn.disabled = true;
+      longBtn.title = "所选包含短链，无法还原为长链";
+    }
+    if (!hasLong) {
       shortBtn.disabled = true;
-      shortBtn.title = "该站点暂不支持短链";
+      shortBtn.title = "所选均为短链，无需转换";
     }
     modalEl.querySelector("#amc-copy-long").onclick = async () => {
       const count = await copyMagnetsToClipboard(selectedItems);
