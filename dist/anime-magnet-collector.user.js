@@ -281,10 +281,7 @@
     if (hasShort) {
       longBtn.disabled = true;
       longBtn.title = "所选包含短链，无法还原为长链";
-    }
-    if (!hasLong) {
-      shortBtn.disabled = true;
-      shortBtn.title = "所选均为短链，无需转换";
+      shortBtn.title = "所选包含短链，部分直接复制，部分转换";
     }
     modalEl.querySelector("#amc-copy-long").onclick = async () => {
       const count = await copyMagnetsToClipboard(selectedItems);
