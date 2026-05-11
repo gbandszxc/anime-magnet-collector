@@ -16,7 +16,7 @@
 "use strict";
 (() => {
   // src/style.css
-  var style_default = "/* ========================\n   Anime Magnet Collector\n   ======================== */\n\n/* Toolbar */\n#amc-toolbar {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 40px;\n  background: #f8f8f8;\n  border-bottom: 1px solid #ddd;\n  display: flex;\n  align-items: center;\n  padding: 0 16px;\n  gap: 12px;\n  z-index: 2147483647;\n  font-size: 14px;\n  font-family: system-ui, sans-serif;\n}\n\n.amc-toolbar-info {\n  color: #333;\n}\n\n#amc-copy-btn:not(:disabled) {\n  background: #4CAF50;\n  color: white;\n  border: none;\n  padding: 6px 16px;\n  border-radius: 4px;\n  cursor: pointer;\n  font-size: 14px;\n}\n\n#amc-copy-btn:disabled {\n  background: #ccc;\n  color: #888;\n  border: none;\n  padding: 6px 16px;\n  border-radius: 4px;\n  cursor: not-allowed;\n}\n\n.amc-btn {\n  padding: 6px 16px;\n  border-radius: 4px;\n  cursor: pointer;\n  font-size: 14px;\n  border: 1px solid #ccc;\n  background: #fff;\n}\n\n.amc-btn-primary {\n  background: #4CAF50;\n  color: white;\n  border: none;\n}\n\n/* Checkbox Column */\n.amc-checkbox-col {\n  padding: 4px !important;\n}\n\n.amc-checkbox-row,\n.amc-checkbox-header {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Modal Overlay */\n.amc-modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgba(0, 0, 0, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 2147483647;\n  font-family: system-ui, sans-serif;\n}\n\n/* Modal */\n.amc-modal {\n  background: white;\n  border-radius: 8px;\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);\n  width: 90%;\n  max-width: 500px;\n  max-height: 80vh;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n.amc-modal-header {\n  padding: 16px 20px;\n  font-size: 16px;\n  font-weight: 600;\n  border-bottom: 1px solid #eee;\n  color: #333;\n}\n\n.amc-modal-list {\n  padding: 12px 20px;\n  overflow-y: auto;\n  flex: 1;\n}\n\n.amc-modal-item {\n  display: flex;\n  padding: 6px 0;\n  font-size: 14px;\n  color: #444;\n}\n\n.amc-modal-num {\n  color: #888;\n  margin-right: 8px;\n  min-width: 24px;\n}\n\n.amc-modal-title {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.amc-modal-footer {\n  padding: 16px 20px;\n  border-top: 1px solid #eee;\n  display: flex;\n  gap: 8px;\n  justify-content: flex-end;\n}\n\n/* Toast */\n.amc-toast {\n  position: fixed;\n  bottom: 20px;\n  left: 50%;\n  transform: translateX(-50%);\n  background: #333;\n  color: white;\n  padding: 10px 20px;\n  border-radius: 4px;\n  font-size: 14px;\n  z-index: 2147483647;\n  font-family: system-ui, sans-serif;\n  animation: amc-fade-in 0.2s ease;\n}\n\n@keyframes amc-fade-in {\n  from { opacity: 0; transform: translateX(-50%) translateY(10px); }\n  to { opacity: 1; transform: translateX(-50%) translateY(0); }\n}\n";
+  var style_default = "/* ========================\n   Anime Magnet Collector\n   ======================== */\n\n/* Floating Panel */\n#amc-float {\n  position: fixed;\n  z-index: 2147483647;\n  display: flex;\n  align-items: center;\n  gap: 2px;\n  background: rgba(255, 255, 255, 0.95);\n  backdrop-filter: blur(12px);\n  -webkit-backdrop-filter: blur(12px);\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  border-radius: 999px;\n  padding: 6px 12px 6px 8px;\n  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);\n  font-family: system-ui, -apple-system, sans-serif;\n  font-size: 13px;\n  user-select: none;\n  cursor: default;\n  transition: box-shadow 0.2s ease;\n}\n\n#amc-float:hover {\n  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);\n}\n\n#amc-float.amc-float-dragging {\n  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);\n  cursor: grabbing;\n}\n\n.amc-float-handle {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  color: #999;\n  cursor: grab;\n  border-radius: 50%;\n  transition: color 0.15s ease, background 0.15s ease;\n}\n\n.amc-float-handle:hover {\n  color: #666;\n  background: rgba(0, 0, 0, 0.05);\n}\n\n.amc-float-dragging .amc-float-handle {\n  cursor: grabbing;\n}\n\n.amc-float-content {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n}\n\n.amc-float-count {\n  color: #333;\n  font-weight: 500;\n  white-space: nowrap;\n}\n\n.amc-float-count span {\n  color: #4CAF50;\n  font-weight: 700;\n}\n\n.amc-float-btn {\n  padding: 5px 14px;\n  border-radius: 999px;\n  border: none;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  white-space: nowrap;\n}\n\n.amc-float-btn:not(:disabled) {\n  background: #4CAF50;\n  color: white;\n}\n\n.amc-float-btn:not(:disabled):hover {\n  background: #43a047;\n  transform: scale(1.02);\n}\n\n.amc-float-btn:disabled {\n  background: rgba(0, 0, 0, 0.08);\n  color: #aaa;\n  cursor: not-allowed;\n}\n\n/* Checkbox Column */\n.amc-checkbox-col {\n  padding: 4px !important;\n}\n\n.amc-checkbox-row,\n.amc-checkbox-header {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Modal Overlay */\n.amc-modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgba(0, 0, 0, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 2147483647;\n  font-family: system-ui, sans-serif;\n}\n\n/* Modal */\n.amc-modal {\n  background: white;\n  border-radius: 8px;\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);\n  width: 90%;\n  max-width: 500px;\n  max-height: 80vh;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n.amc-modal-header {\n  padding: 16px 20px;\n  font-size: 16px;\n  font-weight: 600;\n  border-bottom: 1px solid #eee;\n  color: #333;\n}\n\n.amc-modal-list {\n  padding: 12px 20px;\n  overflow-y: auto;\n  flex: 1;\n}\n\n.amc-modal-item {\n  display: flex;\n  padding: 6px 0;\n  font-size: 14px;\n  color: #444;\n}\n\n.amc-modal-num {\n  color: #888;\n  margin-right: 8px;\n  min-width: 24px;\n}\n\n.amc-modal-title {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.amc-modal-footer {\n  padding: 16px 20px;\n  border-top: 1px solid #eee;\n  display: flex;\n  gap: 8px;\n  justify-content: flex-end;\n}\n\n/* Toast */\n.amc-toast {\n  position: fixed;\n  bottom: 20px;\n  left: 50%;\n  transform: translateX(-50%);\n  background: #333;\n  color: white;\n  padding: 10px 20px;\n  border-radius: 4px;\n  font-size: 14px;\n  z-index: 2147483647;\n  font-family: system-ui, sans-serif;\n  animation: amc-fade-in 0.2s ease;\n}\n\n@keyframes amc-fade-in {\n  from { opacity: 0; transform: translateX(-50%) translateY(10px); }\n  to { opacity: 1; transform: translateX(-50%) translateY(0); }\n}\n";
 
   // src/config.ts
   var CONFIG = {
@@ -288,10 +288,17 @@
   // src/components/Toolbar.ts
   function injectToolbar() {
     const toolbar = document.createElement("div");
-    toolbar.id = "amc-toolbar";
+    toolbar.id = "amc-float";
     toolbar.innerHTML = `
-    <span class="amc-toolbar-info">已选 <span id="amc-count">0</span> 项</span>
-    <button id="amc-copy-btn" class="amc-btn" disabled>复制</button>
+    <div class="amc-float-handle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+      </svg>
+    </div>
+    <div class="amc-float-content">
+      <span class="amc-float-count"><span id="amc-count">0</span> 项</span>
+      <button id="amc-copy-btn" class="amc-float-btn" disabled>复制</button>
+    </div>
   `;
     document.body.appendChild(toolbar);
     const countEl = document.getElementById("amc-count");
@@ -305,6 +312,103 @@
         openModal();
       }
     });
+    initFloatPanel(toolbar);
+  }
+  function initFloatPanel(panel) {
+    const handle = panel.querySelector(".amc-float-handle");
+    const state = {
+      dragging: false,
+      offset: { x: 0, y: 0 },
+      snapped: null
+    };
+    const snapDistance = 10;
+    const edgeMargin = 16;
+    function getDefaultPosition() {
+      return { x: window.innerWidth - panel.offsetWidth - edgeMargin, y: window.innerHeight / 2 - panel.offsetHeight / 2 };
+    }
+    function initPosition() {
+      const pos = getDefaultPosition();
+      panel.style.left = `${pos.x}px`;
+      panel.style.top = `${pos.y}px`;
+      panel.style.right = "auto";
+      state.snapped = "right";
+    }
+    function snapToEdge(mouseX) {
+      const panelRect = panel.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      if (mouseX < viewportWidth / 2) {
+        panel.style.left = `${edgeMargin}px`;
+        panel.style.right = "auto";
+        state.snapped = "left";
+      } else {
+        panel.style.left = "auto";
+        panel.style.right = `${edgeMargin}px`;
+        state.snapped = "right";
+      }
+    }
+    function onMouseDown(e) {
+      if (e.target.closest(".amc-float-btn")) return;
+      e.preventDefault();
+      state.dragging = true;
+      const rect = panel.getBoundingClientRect();
+      state.offset.x = e.clientX - rect.left;
+      state.offset.y = e.clientY - rect.top;
+      panel.classList.add("amc-float-dragging");
+    }
+    function onMouseMove(e) {
+      if (!state.dragging) return;
+      const x = e.clientX - state.offset.x;
+      const y = e.clientY - state.offset.y;
+      panel.style.left = `${x}px`;
+      panel.style.top = `${y}px`;
+      panel.style.right = "auto";
+      state.snapped = null;
+    }
+    function onMouseUp(e) {
+      if (!state.dragging) return;
+      state.dragging = false;
+      panel.classList.remove("amc-float-dragging");
+      snapToEdge(e.clientX);
+    }
+    function onResize() {
+      if (state.snapped === "left") {
+        panel.style.left = `${edgeMargin}px`;
+        panel.style.right = "auto";
+      } else if (state.snapped === "right") {
+        panel.style.left = "auto";
+        panel.style.right = `${edgeMargin}px`;
+      }
+    }
+    handle.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("resize", onResize);
+    handle.addEventListener("touchstart", (e) => {
+      if (e.target.closest(".amc-float-btn")) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      state.dragging = true;
+      const rect = panel.getBoundingClientRect();
+      state.offset.x = touch.clientX - rect.left;
+      state.offset.y = touch.clientY - rect.top;
+      panel.classList.add("amc-float-dragging");
+    }, { passive: false });
+    document.addEventListener("touchmove", (e) => {
+      if (!state.dragging) return;
+      const touch = e.touches[0];
+      panel.style.left = `${touch.clientX - state.offset.x}px`;
+      panel.style.top = `${touch.clientY - state.offset.y}px`;
+      panel.style.right = "auto";
+      state.snapped = null;
+    });
+    document.addEventListener("touchend", (e) => {
+      if (!state.dragging) return;
+      state.dragging = false;
+      panel.classList.remove("amc-float-dragging");
+      const touch = e.changedTouches[0];
+      snapToEdge(touch.clientX);
+    });
+    requestAnimationFrame(initPosition);
   }
 
   // src/main.ts

@@ -2,60 +2,99 @@
    Anime Magnet Collector
    ======================== */
 
-/* Toolbar */
-#amc-toolbar {
+/* Floating Panel */
+#amc-float {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: #f8f8f8;
-  border-bottom: 1px solid #ddd;
+  z-index: 2147483647;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 12px;
-  z-index: 2147483647;
-  font-size: 14px;
-  font-family: system-ui, sans-serif;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  padding: 6px 12px 6px 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  user-select: none;
+  cursor: default;
+  transition: box-shadow 0.2s ease;
 }
 
-.amc-toolbar-info {
+#amc-float:hover {
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+#amc-float.amc-float-dragging {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);
+  cursor: grabbing;
+}
+
+.amc-float-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #999;
+  cursor: grab;
+  border-radius: 50%;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.amc-float-handle:hover {
+  color: #666;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.amc-float-dragging .amc-float-handle {
+  cursor: grabbing;
+}
+
+.amc-float-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.amc-float-count {
   color: #333;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-#amc-copy-btn:not(:disabled) {
+.amc-float-count span {
+  color: #4CAF50;
+  font-weight: 700;
+}
+
+.amc-float-btn {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.amc-float-btn:not(:disabled) {
   background: #4CAF50;
   color: white;
-  border: none;
-  padding: 6px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
 }
 
-#amc-copy-btn:disabled {
-  background: #ccc;
-  color: #888;
-  border: none;
-  padding: 6px 16px;
-  border-radius: 4px;
+.amc-float-btn:not(:disabled):hover {
+  background: #43a047;
+  transform: scale(1.02);
+}
+
+.amc-float-btn:disabled {
+  background: rgba(0, 0, 0, 0.08);
+  color: #aaa;
   cursor: not-allowed;
-}
-
-.amc-btn {
-  padding: 6px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  background: #fff;
-}
-
-.amc-btn-primary {
-  background: #4CAF50;
-  color: white;
-  border: none;
 }
 
 /* Checkbox Column */
