@@ -1,7 +1,8 @@
 import { dmhyAdapter } from "./dmhy";
+import { anonekoAdapter } from "./anoneko";
 import type { SiteAdapter } from "./types";
 
-export const adapters: SiteAdapter[] = [dmhyAdapter];
+export const adapters: SiteAdapter[] = [dmhyAdapter, anonekoAdapter];
 
 export function findAdapter(): SiteAdapter | undefined {
   const url = window.location.href;

@@ -56,8 +56,16 @@
     }
   };
 
+  // src/sites/anoneko.ts
+  var anonekoAdapter = {
+    ...dmhyAdapter,
+    siteId: "anoneko",
+    siteName: "动漫花园(镜像)",
+    matchPatterns: ["https://dmhy.anoneko.com/*"]
+  };
+
   // src/sites/index.ts
-  var adapters = [dmhyAdapter];
+  var adapters = [dmhyAdapter, anonekoAdapter];
   function findAdapter() {
     const url = window.location.href;
     return adapters.find(
