@@ -1,48 +1,48 @@
-# Anime Magnet Collector - Design System
+# Anime Magnet Collector - 设计系统
 
-## Principles
+## 原则
 
-- **Compact** - Minimal footprint, content-first
-- **Non-intrusive** - Floating panel that stays out of the way
-- **Native feel** - System fonts, native interactions
+- **紧凑** - 最小占用空间，内容优先
+- **不打扰** - 悬浮面板设计，不遮挡内容
+- **原生感** - 系统字体，原生交互
 
 ---
 
 ## Design Tokens
 
-### Color
+### 色彩
 
 ```css
 :root {
-  /* Background */
+  /* 背景 */
   --amc-bg: rgba(255, 255, 255, 0.95);
-  --amc-bg-hover: rgba(255, 255, 255, 0.98);
+  --amc-bg-solid: #ffffff;
   --amc-bg-disabled: rgba(0, 0, 0, 0.08);
   --amc-bg-overlay: rgba(0, 0, 0, 0.5);
 
-  /* Text */
+  /* 文字 */
   --amc-text-primary: #333333;
   --amc-text-secondary: #666666;
   --amc-text-muted: #999999;
   --amc-text-disabled: #aaaaaa;
   --amc-text-inverse: #ffffff;
 
-  /* Accent */
+  /* 强调色 */
   --amc-accent: #4CAF50;
   --amc-accent-hover: #43a047;
 
-  /* Border */
+  /* 边框 */
   --amc-border: rgba(0, 0, 0, 0.1);
   --amc-border-hover: rgba(0, 0, 0, 0.15);
 
-  /* Shadow */
+  /* 阴影 */
   --amc-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
-  --amc-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.12);
-  --amc-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.2);
+  --amc-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  --amc-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 ```
 
-### Spacing
+### 间距
 
 ```css
 :root {
@@ -54,34 +54,31 @@
 }
 ```
 
-### Radius
+### 圆角
 
 ```css
 :root {
   --amc-radius-sm: 4px;
   --amc-radius-md: 8px;
-  --amc-radius-lg: 12px;
   --amc-radius-pill: 999px;
 }
 ```
 
-### Typography
+### 字体
 
 ```css
 :root {
   --amc-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --amc-font-size-xs: 11px;
   --amc-font-size-sm: 13px;
   --amc-font-size-md: 14px;
   --amc-font-size-lg: 16px;
-  --amc-font-weight-normal: 400;
   --amc-font-weight-medium: 500;
   --amc-font-weight-semibold: 600;
   --amc-font-weight-bold: 700;
 }
 ```
 
-### Motion
+### 动效
 
 ```css
 :root {
@@ -91,7 +88,7 @@
 }
 ```
 
-### Z-Index
+### 层级
 
 ```css
 :root {
@@ -101,70 +98,71 @@
 
 ---
 
-## Components
+## 组件
 
-### Floating Panel (`#amc-float`)
+### 悬浮面板 (`#amc-float`)
 
-**Purpose**: Primary interaction point for copy selection.
+**用途**：复制选中的主要交互入口。
 
-**Appearance**:
-- Pill-shaped container with glass blur
-- Contains: drag handle + count badge + action button
-- Default position: top-left corner with 16px margin
+**外观**：
+- 药丸形容器，毛玻璃效果
+- 包含：拖动手柄 + 计数徽章 + 操作按钮
+- 默认位置：左上角，16px 边距
 
-**States**:
-- Default: Subtle shadow, blurred background
-- Hover: Enhanced shadow
-- Dragging: Elevated shadow, cursor changes to grabbing
+**状态**：
+- 默认：轻微阴影，毛玻璃背景
+- 悬停：阴影增强
+- 拖拽中：阴影提升，光标变为抓取
 
-**Layout**:
+**布局**：
 ```
-[:: handle ::] [count] 项  [复制]
+[:: 手柄 ::] [count] 项  [复制]
 ```
 
 ---
 
-### Modal (`#amc-modal`)
+### 弹窗 (`#amc-modal`)
 
-**Purpose**: Display selected magnet links for copying.
+**用途**：展示选中的磁力链接供复制。
 
-**Appearance**:
-- Centered card with backdrop overlay
-- Matches floating panel aesthetic: same border-radius, shadow style, font
-- Header with title, scrollable list body, footer with close button
+**外观**：
+- 居中卡片 + 背景遮罩
+- 与悬浮面板保持一致的设计语言：相同圆角、阴影风格、字体
+- 包含标题栏、可滚动列表、底部关闭按钮
 
-**States**:
-- Entry: Fade in with slight upward motion
-- Exit: Fade out
+**状态**：
+- 入场：淡入 + 轻微上移动画
+- 退场：淡出
 
-**Layout**:
+**布局**：
 ```
 ┌─────────────────────────────┐
-│  已选择 5 项                  │  ← Header
+│  已选择 5 项                  │  ← 标题栏
 ├─────────────────────────────┤
-│  1. [title truncated...]     │
-│  2. [title truncated...]     │  ← Scrollable list
+│  1. [标题截断...]             │
+│  2. [标题截断...]            │  ← 可滚动列表
 │  ...                         │
 ├─────────────────────────────┤
-│                      [关闭]  │  ← Footer
+│                      [关闭]  │  ← 底部栏
 └─────────────────────────────┘
 ```
 
 ---
 
-### Toast (`#amc-toast`)
+### 提示 (`#amc-toast`)
 
-**Purpose**: Non-blocking feedback after copy action.
+**用途**：复制操作后的非阻塞反馈。
 
-**Appearance**:
-- Bottom-center pill notification
-- Semi-transparent dark background
+**外观**：
+- 底部居中的药丸形通知
+- 半透明深色背景
 
 ---
 
-## Checklist
+## 样式修改检查清单
 
-- [x] Floating panel draggable with snap-to-edge
-- [x] Touch support for mobile
-- [x] Consistent token system across components
-- [x] Modal uses same design language as floating panel
+修改样式前必须确认：
+- [ ] 优先使用已有的 `--amc-*` token 变量
+- [ ] 新增 token 需同步更新本文档
+- [ ] 新增组件必须复用 token，保持视觉一致性
+- [ ] 按钮使用 `.amc-float-btn` 类名以保持一致
