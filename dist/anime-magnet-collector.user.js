@@ -314,7 +314,7 @@
     const toolbar = document.createElement("div");
     toolbar.id = "amc-float";
     toolbar.innerHTML = `
-    <div class="amc-float-handle" title="收起/展开">
+    <div class="amc-float-handle" title="拖动或点击折叠">
       <svg class="amc-float-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
       </svg>
@@ -342,11 +342,11 @@
     const handle = panel.querySelector(".amc-float-handle");
     const state = {
       dragging: false,
-      offset: { x: 0, y: 0 },
-      snapped: null
+      dragOffsetX: 0,
+      dragOffsetY: 0,
+      snapped: "left"
     };
     const edgeMargin = 16;
-    const moveThreshold = 5;
     function getDefaultPosition() {
       return { x: edgeMargin, y: edgeMargin };
     }
@@ -373,101 +373,103 @@
       const isCollapsed = panel.classList.contains("amc-float-collapsed");
       if (isCollapsed) {
         panel.classList.remove("amc-float-collapsed");
-        handle.title = "收起/展开";
-        if (state.snapped === "left") {
-          panel.style.left = `${edgeMargin}px`;
-          panel.style.right = "auto";
-        } else {
-          panel.style.left = "auto";
-          panel.style.right = `${edgeMargin}px`;
-        }
+        handle.title = "拖动或点击折叠";
       } else {
         panel.classList.add("amc-float-collapsed");
-        handle.title = "展开";
-        if (state.snapped === "left") {
-          panel.style.left = `${edgeMargin}px`;
-          panel.style.right = "auto";
-        } else {
-          panel.style.left = "auto";
-          panel.style.right = `${edgeMargin}px`;
-        }
+        handle.title = "点击展开";
       }
     }
-    let dragStartPos = null;
-    handle.addEventListener("mousedown", (e) => {
-      if (e.target.closest(".amc-float-btn")) return;
-      e.preventDefault();
-      dragStartPos = { x: e.clientX, y: e.clientY };
-      state.dragging = false;
-    });
-    document.addEventListener("mousemove", (e) => {
-      if (!dragStartPos) return;
-      const dx = e.clientX - dragStartPos.x;
-      const dy = e.clientY - dragStartPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance > moveThreshold) {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let hasMoved = false;
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!state.dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
         state.dragging = true;
-        const rect = panel.getBoundingClientRect();
-        state.offset.x = e.clientX - rect.left;
-        state.offset.y = e.clientY - rect.top;
         panel.classList.add("amc-float-dragging");
-        dragStartPos = null;
+        const rect = panel.getBoundingClientRect();
+        state.dragOffsetX = e.clientX - rect.left;
+        state.dragOffsetY = e.clientY - rect.top;
       }
       if (state.dragging) {
-        panel.style.left = `${e.clientX - state.offset.x}px`;
-        panel.style.top = `${e.clientY - state.offset.y}px`;
+        panel.style.left = `${e.clientX - state.dragOffsetX}px`;
+        panel.style.top = `${e.clientY - state.dragOffsetY}px`;
         panel.style.right = "auto";
         state.snapped = null;
       }
+    };
+    const onMouseUp = (e) => {
+      if (isDragging) {
+        if (state.dragging) {
+          state.dragging = false;
+          panel.classList.remove("amc-float-dragging");
+          snapToEdge(e.clientX);
+        }
+        isDragging = false;
+        hasMoved = false;
+      }
+    };
+    handle.addEventListener("mousedown", (e) => {
+      if (e.target.closest(".amc-float-btn")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      state.dragging = false;
+      hasMoved = false;
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp, { once: true });
     });
-    document.addEventListener("mouseup", (e) => {
-      if (state.dragging) {
-        state.dragging = false;
-        panel.classList.remove("amc-float-dragging");
-        snapToEdge(e.clientX);
-      } else if (dragStartPos) {
+    handle.addEventListener("click", (e) => {
+      if (!state.dragging && !hasMoved) {
         toggleCollapse();
       }
-      dragStartPos = null;
+      state.dragging = false;
+      hasMoved = false;
     });
     handle.addEventListener("touchstart", (e) => {
       if (e.target.closest(".amc-float-btn")) return;
       e.preventDefault();
       const touch = e.touches[0];
-      dragStartPos = { x: touch.clientX, y: touch.clientY };
+      isDragging = true;
+      startX = touch.clientX;
+      startY = touch.clientY;
       state.dragging = false;
+      hasMoved = false;
     }, { passive: false });
     document.addEventListener("touchmove", (e) => {
-      if (!dragStartPos) return;
+      if (!isDragging) return;
       const touch = e.touches[0];
-      const dx = touch.clientX - dragStartPos.x;
-      const dy = touch.clientY - dragStartPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance > moveThreshold) {
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      if (!state.dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
         state.dragging = true;
-        const rect = panel.getBoundingClientRect();
-        state.offset.x = touch.clientX - rect.left;
-        state.offset.y = touch.clientY - rect.top;
         panel.classList.add("amc-float-dragging");
-        dragStartPos = null;
+        const rect = panel.getBoundingClientRect();
+        state.dragOffsetX = touch.clientX - rect.left;
+        state.dragOffsetY = touch.clientY - rect.top;
       }
       if (state.dragging) {
-        panel.style.left = `${touch.clientX - state.offset.x}px`;
-        panel.style.top = `${touch.clientY - state.offset.y}px`;
+        panel.style.left = `${touch.clientX - state.dragOffsetX}px`;
+        panel.style.top = `${touch.clientY - state.dragOffsetY}px`;
         panel.style.right = "auto";
         state.snapped = null;
       }
-    });
+    }, { passive: false });
     document.addEventListener("touchend", (e) => {
-      if (state.dragging) {
-        state.dragging = false;
-        panel.classList.remove("amc-float-dragging");
-        const touch = e.changedTouches[0];
-        snapToEdge(touch.clientX);
-      } else if (dragStartPos) {
-        toggleCollapse();
+      if (isDragging) {
+        if (state.dragging) {
+          state.dragging = false;
+          panel.classList.remove("amc-float-dragging");
+          const touch = e.changedTouches[0];
+          snapToEdge(touch.clientX);
+        }
+        isDragging = false;
       }
-      dragStartPos = null;
     });
     handle.addEventListener("dblclick", (e) => {
       e.preventDefault();

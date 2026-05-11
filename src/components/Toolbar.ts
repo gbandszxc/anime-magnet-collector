@@ -5,7 +5,7 @@ export function injectToolbar(): void {
   const toolbar = document.createElement("div");
   toolbar.id = "amc-float";
   toolbar.innerHTML = `
-    <div class="amc-float-handle" title="收起/展开">
+    <div class="amc-float-handle" title="拖动或点击折叠">
       <svg class="amc-float-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
       </svg>
@@ -35,32 +35,23 @@ export function injectToolbar(): void {
   initFloatPanel(toolbar);
 }
 
-interface Position {
-  x: number;
-  y: number;
-}
-
 function initFloatPanel(panel: HTMLElement): void {
   const handle = panel.querySelector(".amc-float-handle") as HTMLElement;
 
-  const state: {
-    dragging: boolean;
-    offset: Position;
-    snapped: "left" | "right" | null;
-  } = {
+  const state = {
     dragging: false,
-    offset: { x: 0, y: 0 },
-    snapped: null,
+    dragOffsetX: 0,
+    dragOffsetY: 0,
+    snapped: "left" as "left" | "right" | null,
   };
 
   const edgeMargin = 16;
-  const moveThreshold = 5; // 移动超过5px才算拖动
 
-  function getDefaultPosition(): Position {
+  function getDefaultPosition() {
     return { x: edgeMargin, y: edgeMargin };
   }
 
-  function initPosition(): void {
+  function initPosition() {
     const pos = getDefaultPosition();
     panel.style.left = `${pos.x}px`;
     panel.style.top = `${pos.y}px`;
@@ -68,7 +59,7 @@ function initFloatPanel(panel: HTMLElement): void {
     state.snapped = "left";
   }
 
-  function snapToEdge(mouseX: number): void {
+  function snapToEdge(mouseX: number) {
     const viewportWidth = window.innerWidth;
 
     if (mouseX < viewportWidth / 2) {
@@ -82,132 +73,141 @@ function initFloatPanel(panel: HTMLElement): void {
     }
   }
 
-  function toggleCollapse(): void {
+  function toggleCollapse() {
     const isCollapsed = panel.classList.contains("amc-float-collapsed");
 
     if (isCollapsed) {
       panel.classList.remove("amc-float-collapsed");
-      handle.title = "收起/展开";
-      if (state.snapped === "left") {
-        panel.style.left = `${edgeMargin}px`;
-        panel.style.right = "auto";
-      } else {
-        panel.style.left = "auto";
-        panel.style.right = `${edgeMargin}px`;
-      }
+      handle.title = "拖动或点击折叠";
     } else {
       panel.classList.add("amc-float-collapsed");
-      handle.title = "展开";
-      if (state.snapped === "left") {
-        panel.style.left = `${edgeMargin}px`;
-        panel.style.right = "auto";
-      } else {
-        panel.style.left = "auto";
-        panel.style.right = `${edgeMargin}px`;
-      }
+      handle.title = "点击展开";
     }
   }
 
-  // 鼠标按下
-  let dragStartPos: Position | null = null;
+  // 拖动逻辑 - 分离拖动和点击检测
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let hasMoved = false;
 
-  handle.addEventListener("mousedown", (e: MouseEvent) => {
-    if ((e.target as HTMLElement).closest(".amc-float-btn")) return;
-    e.preventDefault();
-    dragStartPos = { x: e.clientX, y: e.clientY };
-    state.dragging = false;
-  });
+  const onMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
 
-  document.addEventListener("mousemove", (e: MouseEvent) => {
-    if (!dragStartPos) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
 
-    const dx = e.clientX - dragStartPos.x;
-    const dy = e.clientY - dragStartPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance > moveThreshold) {
-      // 开始拖动
+    // 只有移动超过阈值才启动拖动
+    if (!state.dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
       state.dragging = true;
-      const rect = panel.getBoundingClientRect();
-      state.offset.x = e.clientX - rect.left;
-      state.offset.y = e.clientY - rect.top;
       panel.classList.add("amc-float-dragging");
-      dragStartPos = null;
+      // 计算初始偏移
+      const rect = panel.getBoundingClientRect();
+      state.dragOffsetX = e.clientX - rect.left;
+      state.dragOffsetY = e.clientY - rect.top;
     }
 
     if (state.dragging) {
-      panel.style.left = `${e.clientX - state.offset.x}px`;
-      panel.style.top = `${e.clientY - state.offset.y}px`;
+      panel.style.left = `${e.clientX - state.dragOffsetX}px`;
+      panel.style.top = `${e.clientY - state.dragOffsetY}px`;
       panel.style.right = "auto";
       state.snapped = null;
     }
+  };
+
+  const onMouseUp = (e: MouseEvent) => {
+    if (isDragging) {
+      if (state.dragging) {
+        state.dragging = false;
+        panel.classList.remove("amc-float-dragging");
+        snapToEdge(e.clientX);
+      }
+      isDragging = false;
+      hasMoved = false;
+    }
+  };
+
+  // Handle events
+  handle.addEventListener("mousedown", (e: MouseEvent) => {
+    if ((e.target as HTMLElement).closest(".amc-float-btn")) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    state.dragging = false;
+    hasMoved = false;
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp, { once: true });
   });
 
-  document.addEventListener("mouseup", (e: MouseEvent) => {
-    if (state.dragging) {
-      state.dragging = false;
-      panel.classList.remove("amc-float-dragging");
-      snapToEdge(e.clientX);
-    } else if (dragStartPos) {
-      // 点击事件
+  // Click to toggle collapse (only when not dragging)
+  handle.addEventListener("click", (e: MouseEvent) => {
+    if (!state.dragging && !hasMoved) {
       toggleCollapse();
     }
-    dragStartPos = null;
+    // Reset dragging state
+    state.dragging = false;
+    hasMoved = false;
   });
 
   // Touch support
   handle.addEventListener("touchstart", (e: TouchEvent) => {
     if ((e.target as HTMLElement).closest(".amc-float-btn")) return;
     e.preventDefault();
+
     const touch = e.touches[0];
-    dragStartPos = { x: touch.clientX, y: touch.clientY };
+    isDragging = true;
+    startX = touch.clientX;
+    startY = touch.clientY;
     state.dragging = false;
+    hasMoved = false;
   }, { passive: false });
 
   document.addEventListener("touchmove", (e: TouchEvent) => {
-    if (!dragStartPos) return;
+    if (!isDragging) return;
     const touch = e.touches[0];
 
-    const dx = touch.clientX - dragStartPos.x;
-    const dy = touch.clientY - dragStartPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
 
-    if (distance > moveThreshold) {
+    if (!state.dragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
       state.dragging = true;
-      const rect = panel.getBoundingClientRect();
-      state.offset.x = touch.clientX - rect.left;
-      state.offset.y = touch.clientY - rect.top;
       panel.classList.add("amc-float-dragging");
-      dragStartPos = null;
+      const rect = panel.getBoundingClientRect();
+      state.dragOffsetX = touch.clientX - rect.left;
+      state.dragOffsetY = touch.clientY - rect.top;
     }
 
     if (state.dragging) {
-      panel.style.left = `${touch.clientX - state.offset.x}px`;
-      panel.style.top = `${touch.clientY - state.offset.y}px`;
+      panel.style.left = `${touch.clientX - state.dragOffsetX}px`;
+      panel.style.top = `${touch.clientY - state.dragOffsetY}px`;
       panel.style.right = "auto";
       state.snapped = null;
     }
-  });
+  }, { passive: false });
 
   document.addEventListener("touchend", (e: TouchEvent) => {
-    if (state.dragging) {
-      state.dragging = false;
-      panel.classList.remove("amc-float-dragging");
-      const touch = e.changedTouches[0];
-      snapToEdge(touch.clientX);
-    } else if (dragStartPos) {
-      toggleCollapse();
+    if (isDragging) {
+      if (state.dragging) {
+        state.dragging = false;
+        panel.classList.remove("amc-float-dragging");
+        const touch = e.changedTouches[0];
+        snapToEdge(touch.clientX);
+      }
+      isDragging = false;
     }
-    dragStartPos = null;
   });
 
-  // 双击手柄也可折叠
+  // Double click to toggle collapse
   handle.addEventListener("dblclick", (e: MouseEvent) => {
     e.preventDefault();
     toggleCollapse();
   });
 
-  function onResize(): void {
+  function onResize() {
     if (state.snapped === "left") {
       panel.style.left = `${edgeMargin}px`;
       panel.style.right = "auto";
