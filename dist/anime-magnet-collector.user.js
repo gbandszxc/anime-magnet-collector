@@ -129,8 +129,56 @@
     _titleIdx: 1
   };
 
+  // src/sites/acgnx.ts
+  var acgnxAdapter = {
+    siteId: "acgnx",
+    siteName: "AcgnX",
+    matchPatterns: ["https://www.acgnx.se/*"],
+    tableSelector: "table#listTable",
+    rowSelector: "tbody tr",
+    titleHeader: "Name",
+    magnetCellSelector: "#magnet",
+    extractMagnet(row) {
+      const link = row.querySelector("#magnet");
+      return link?.href ?? "";
+    },
+    extractTitle(row) {
+      const cells = row.querySelectorAll("td");
+      const cell = cells[2];
+      const link = cell?.querySelector("a");
+      return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
+    },
+    buildShortMagnet(magnet) {
+      return buildShortMagnet(magnet);
+    }
+  };
+
+  // src/sites/shareacgnx.ts
+  var shareacgnxAdapter = {
+    siteId: "shareacgnx",
+    siteName: "AcgnX中文站",
+    matchPatterns: ["https://share.acgnx.se/*"],
+    tableSelector: "table#listTable",
+    rowSelector: "tbody tr",
+    titleHeader: "資源名稱",
+    magnetCellSelector: "#magnet",
+    extractMagnet(row) {
+      const link = row.querySelector("#magnet");
+      return link?.href ?? "";
+    },
+    extractTitle(row) {
+      const cells = row.querySelectorAll("td");
+      const cell = cells[2];
+      const link = cell?.querySelector("a");
+      return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
+    },
+    buildShortMagnet(magnet) {
+      return buildShortMagnet(magnet);
+    }
+  };
+
   // src/sites/index.ts
-  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter];
+  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter];
   function findAdapter() {
     const url = window.location.href;
     return adapters.find(

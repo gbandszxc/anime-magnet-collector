@@ -2,9 +2,11 @@ import { dmhyAdapter } from "./dmhy";
 import { anonekoAdapter } from "./anoneko";
 import { nyaaAdapter } from "./nyaa";
 import { sukebeiAdapter } from "./sukebei";
+import { acgnxAdapter } from "./acgnx";
+import { shareacgnxAdapter } from "./shareacgnx";
 import type { SiteAdapter } from "./types";
 
-export const adapters: SiteAdapter[] = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter];
+export const adapters: SiteAdapter[] = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter];
 
 export function findAdapter(): SiteAdapter | undefined {
   const url = window.location.href;
