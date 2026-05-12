@@ -32,6 +32,32 @@ function init(): void {
 
   log(`检测到站点: ${adapter.siteName}`);
 
+  if (adapter.siteId === "bangumi") {
+    // 等待 md-list 渲染完成
+    const container = document.querySelector(adapter.tableSelector);
+    if (container) {
+      let injected = false;
+      const observer = new MutationObserver((mutations, obs) => {
+        if (injected) {
+          obs.disconnect();
+          return;
+        }
+        const items = container.querySelectorAll(adapter.rowSelector);
+        if (items.length > 0) {
+          injectToolbar({
+            onClose: () => removeCheckboxColumn(adapter),
+          });
+          injectCheckboxColumn(adapter);
+          injected = true;
+          obs.disconnect();
+        }
+      });
+      observer.observe(container, { childList: true, subtree: true });
+      log("等待列表渲染...");
+      return;
+    }
+  }
+
   injectToolbar({
     onClose: () => removeCheckboxColumn(adapter),
   });

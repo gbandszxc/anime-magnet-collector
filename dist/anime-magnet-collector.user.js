@@ -475,9 +475,10 @@
     document.body.appendChild(modalEl);
     const longBtn = modalEl.querySelector("#amc-copy-long");
     const shortBtn = modalEl.querySelector("#amc-copy-short");
-    const hasLong = selectedItems.some((item) => isLongMagnet(item.magnet));
     const hasShort = selectedItems.some((item) => !isLongMagnet(item.magnet));
-    if (hasShort) {
+    if (adapter.siteId === "acgrip") {
+      shortBtn.title = "复制 torrent 链接";
+    } else if (hasShort) {
       longBtn.disabled = true;
       longBtn.title = "所选包含短链，无法还原为长链";
       shortBtn.title = "所选包含短链，部分直接复制，部分转换";
@@ -824,6 +825,30 @@
       return;
     }
     log(`检测到站点: ${adapter.siteName}`);
+    if (adapter.siteId === "bangumi") {
+      const container = document.querySelector(adapter.tableSelector);
+      if (container) {
+        let injected = false;
+        const observer = new MutationObserver((mutations, obs) => {
+          if (injected) {
+            obs.disconnect();
+            return;
+          }
+          const items = container.querySelectorAll(adapter.rowSelector);
+          if (items.length > 0) {
+            injectToolbar({
+              onClose: () => removeCheckboxColumn(adapter)
+            });
+            injectCheckboxColumn(adapter);
+            injected = true;
+            obs.disconnect();
+          }
+        });
+        observer.observe(container, { childList: true, subtree: true });
+        log("等待列表渲染...");
+        return;
+      }
+    }
     injectToolbar({
       onClose: () => removeCheckboxColumn(adapter)
     });
