@@ -4,9 +4,11 @@ import { nyaaAdapter } from "./nyaa";
 import { sukebeiAdapter } from "./sukebei";
 import { acgnxAdapter } from "./acgnx";
 import { shareacgnxAdapter } from "./shareacgnx";
+import { bangumiAdapter } from "./bangumi";
+import { acgripAdapter } from "./acgrip";
 import type { SiteAdapter } from "./types";
 
-export const adapters: SiteAdapter[] = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter];
+export const adapters: SiteAdapter[] = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter, bangumiAdapter, acgripAdapter];
 
 export function findAdapter(): SiteAdapter | undefined {
   const url = window.location.href;
