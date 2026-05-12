@@ -56,7 +56,7 @@
 | [**Nyaa**](https://nyaa.si) | 资源列表页 |
 | [**Sukebei**](https://sukebei.nyaa.si) | 资源列表页 |
 | [**AcgnX**](https://www.acgnx.se) | 资源列表页 |
-| [**AcgnX中文站**](https://share.acgnx.se) | 资源列表页 |
+| [**AcgnX 中文站**](https://share.acgnx.se) | 资源列表页 |
 
 ---
 
