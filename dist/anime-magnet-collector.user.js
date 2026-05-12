@@ -145,8 +145,11 @@
       return link?.href ?? "";
     },
     extractTitle(row) {
+      const adapterExt = this;
+      const idx = adapterExt._titleIdx ?? 3;
       const cells = row.querySelectorAll("td");
-      const cell = cells[2];
+      const cell = cells[idx];
+      if (!cell) return "";
       const link = cell?.querySelector("a");
       return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
     },
@@ -169,8 +172,11 @@
       return link?.href ?? "";
     },
     extractTitle(row) {
+      const adapterExt = this;
+      const idx = adapterExt._titleIdx ?? 3;
       const cells = row.querySelectorAll("td");
-      const cell = cells[2];
+      const cell = cells[idx];
+      if (!cell) return "";
       const link = cell?.querySelector("a");
       return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
     },
