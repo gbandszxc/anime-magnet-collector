@@ -51,12 +51,12 @@
 
 | 站点 | 支持页面 |
 |------|----------|
-| **动漫花园** (share.dmhy.org) | 资源列表页 |
-| **动漫花园(镜像)** (dmhy.anoneko.com) | 资源列表页 |
-| **Nyaa** (nyaa.si) | 资源列表页 |
-| **Sukebei** (sukebei.nyaa.si) | 资源列表页 |
-| **AcgnX** (www.acgnx.se) | 资源列表页 |
-| **AcgnX中文站** (share.acgnx.se) | 资源列表页 |
+| [**动漫花园**](https://share.dmhy.org) | 资源列表页 |
+| [**动漫花园(镜像)**](https://dmhy.anoneko.com) | 资源列表页 |
+| [**Nyaa**](https://nyaa.si) | 资源列表页 |
+| [**Sukebei**](https://sukebei.nyaa.si) | 资源列表页 |
+| [**AcgnX**](https://www.acgnx.se) | 资源列表页 |
+| [**AcgnX中文站**](https://share.acgnx.se) | 资源列表页 |
 
 ---
 
