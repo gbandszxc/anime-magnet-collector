@@ -57,6 +57,8 @@
 | [**Sukebei**](https://sukebei.nyaa.si) | 资源列表页 |
 | [**AcgnX**](https://www.acgnx.se) | 资源列表页 |
 | [**AcgnX 中文站**](https://share.acgnx.se) | 资源列表页 |
+| [**萌番组**](https://bangumi.moe) | 资源列表页 |
+| [**ACG.RIP**](https://acg.rip) | 资源列表页 |
 
 ---
 
@@ -132,7 +134,14 @@ bun run verify:dist
 │   ├── sites/               # 站点适配器
 │   │   ├── index.ts         # 适配器注册
 │   │   ├── types.ts         # 类型定义
-│   │   └── dmhy.ts          # 动漫花园适配器
+│   │   ├── dmhy.ts          # 动漫花园适配器
+│   │   ├── acgnx.ts         # AcgnX 适配器
+│   │   ├── shareacgnx.ts    # AcgnX 中文站适配器
+│   │   ├── anoneko.ts       # 动漫花园镜像适配器
+│   │   ├── nyaa.ts          # Nyaa 适配器
+│   │   ├── sukebei.ts       # Sukebei 适配器
+│   │   ├── bangumi.ts       # 萌番组适配器
+│   │   └── acgrip.ts        # ACG.RIP 适配器
 │   ├── components/          # UI 组件
 │   │   ├── Toolbar.ts       # 悬浮面板
 │   │   ├── Modal.ts         # 确认弹窗
@@ -152,6 +161,10 @@ bun run verify:dist
 ---
 
 ## 更新日志
+
+### v1.1.0
+
+- 新增：适配 AcgnX、ACG.RIP、萌番组等更多网站
 
 ### v1.0.0
 
