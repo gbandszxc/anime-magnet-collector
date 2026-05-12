@@ -13,6 +13,7 @@
 // @match      https://share.acgnx.se/*
 // @match      https://bangumi.moe/*
 // @match      https://acg.rip/*
+// @match      https://www.kisssub.org/*
 // @grant      GM_addStyle
 // @grant      GM_log
 // @updateURL    https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/dist/anime-magnet-collector.user.js
@@ -290,8 +291,40 @@
     }
   };
 
+  // src/sites/kisssub.ts
+  var DETAIL_LINK_SELECTOR = 'a[href*="show-"][href$=".html"]';
+  function extractInfoHashFromDetailUrl(url) {
+    const match = url.match(/show-([a-f0-9]{40})\.html/i);
+    return match?.[1].toUpperCase() ?? null;
+  }
+  var kisssubAdapter = {
+    siteId: "kisssub",
+    siteName: "爱恋动漫",
+    matchPatterns: ["https://www.kisssub.org/*"],
+    tableSelector: "table#listTable",
+    rowSelector: "tbody tr",
+    titleHeader: "标题",
+    magnetCellSelector: DETAIL_LINK_SELECTOR,
+    extractMagnet(row) {
+      const link = row.querySelector(DETAIL_LINK_SELECTOR);
+      if (!link?.href) return "";
+      const infoHash = extractInfoHashFromDetailUrl(link.href);
+      if (!infoHash) return "";
+      return `magnet:?xt=urn:btih:${infoHash}`;
+    },
+    extractTitle(row) {
+      const link = row.querySelector(DETAIL_LINK_SELECTOR);
+      return link?.textContent?.trim() ?? "";
+    },
+    buildShortMagnet(magnet) {
+      const infoHash = extractInfoHashFromDetailUrl(magnet) ?? magnet.match(/btih:([^&]+)/i)?.[1]?.toUpperCase();
+      if (!infoHash) return null;
+      return `magnet:?xt=urn:btih:${infoHash}`;
+    }
+  };
+
   // src/sites/index.ts
-  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter, bangumiAdapter, acgripAdapter];
+  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter, bangumiAdapter, acgripAdapter, kisssubAdapter];
   function findAdapter() {
     const url = window.location.href;
     return adapters.find(
