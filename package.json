@@ -11,8 +11,10 @@
     "verify:dist": "bun run scripts/verify-dist.mjs"
   },
   "devDependencies": {
+    "@types/bun": "1.3.13",
     "@types/tampermonkey": "*",
     "esbuild": "^0.28.0",
+    "happy-dom": "20.9.0",
     "typescript": "^6.0.3"
   }
 }

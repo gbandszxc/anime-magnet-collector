@@ -4,6 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2020", "DOM"],
+    "types": ["bun", "tampermonkey"],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true

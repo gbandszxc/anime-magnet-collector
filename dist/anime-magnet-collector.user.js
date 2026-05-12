@@ -142,9 +142,9 @@
     tableSelector: "table#listTable",
     rowSelector: "tbody tr",
     titleHeader: "Name",
-    magnetCellSelector: "#magnet",
+    magnetCellSelector: 'a[href^="magnet:"]',
     extractMagnet(row) {
-      const link = row.querySelector("#magnet");
+      const link = row.querySelector(this.magnetCellSelector);
       return link?.href ?? "";
     },
     extractTitle(row) {
@@ -169,9 +169,9 @@
     tableSelector: "table#listTable",
     rowSelector: "tbody tr",
     titleHeader: "資源名稱",
-    magnetCellSelector: "#magnet",
+    magnetCellSelector: 'a[href^="magnet:"]',
     extractMagnet(row) {
-      const link = row.querySelector("#magnet");
+      const link = row.querySelector(this.magnetCellSelector);
       return link?.href ?? "";
     },
     extractTitle(row) {

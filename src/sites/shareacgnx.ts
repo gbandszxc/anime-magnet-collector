@@ -8,10 +8,10 @@ export const shareacgnxAdapter: SiteAdapter = {
   tableSelector: "table#listTable",
   rowSelector: "tbody tr",
   titleHeader: "資源名稱",
-  magnetCellSelector: "#magnet",
+  magnetCellSelector: 'a[href^="magnet:"]',
 
   extractMagnet(row: Element): string {
-    const link = row.querySelector<HTMLAnchorElement>("#magnet");
+    const link = row.querySelector<HTMLAnchorElement>(this.magnetCellSelector);
     return link?.href ?? "";
   },
 
