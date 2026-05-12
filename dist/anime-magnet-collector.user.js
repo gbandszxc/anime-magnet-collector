@@ -185,8 +185,103 @@
     }
   };
 
+  // src/sites/bangumi.ts
+  var bangumiAdapter = {
+    siteId: "bangumi",
+    siteName: "萌番组",
+    matchPatterns: ["https://bangumi.moe/*"],
+    tableSelector: "md-list.torrent-list",
+    rowSelector: "md-list-item, [class*='torrent']",
+    titleHeader: "",
+    magnetCellSelector: "",
+    extractMagnet(row) {
+      return "";
+    },
+    extractTitle(row) {
+      const titleLink = row.querySelector('a[href^="/torrent/"]');
+      return titleLink?.textContent?.trim() ?? "";
+    },
+    buildShortMagnet(magnet) {
+      return magnet;
+    }
+  };
+  var magnetCache = /* @__PURE__ */ new Map();
+  function buildMagnetCache(torrents) {
+    for (const t of torrents) {
+      if (t._id && t.magnet) {
+        magnetCache.set(t._id, t.magnet);
+      }
+    }
+  }
+  function isHomepage() {
+    return window.location.pathname === "/";
+  }
+  function extractTagId() {
+    const match = window.location.pathname.match(/\/search\/([^/]+)/);
+    return match ? match[1] : null;
+  }
+  async function fetchMagnetPage(page) {
+    if (isHomepage()) {
+      const res = await fetch(`/api/torrent/latest?page=${page}`);
+      const data = await res.json();
+      return data.torrents || [];
+    } else {
+      const tagId = extractTagId();
+      if (!tagId) return [];
+      const res = await fetch("/api/torrent/search", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
+        body: JSON.stringify({ tag_id: [tagId], p: page })
+      });
+      const data = await res.json();
+      return data.torrents || [];
+    }
+  }
+  function getRequiredPages(selectedIndexes) {
+    const pages = /* @__PURE__ */ new Set();
+    for (const idx of selectedIndexes) {
+      pages.add(Math.floor(idx / 30) + 1);
+    }
+    return Array.from(pages).sort((a, b) => a - b);
+  }
+  async function prefetchMagnetsForSelection(selectedIndexes) {
+    const pages = getRequiredPages(selectedIndexes);
+    const promises = pages.map((p) => fetchMagnetPage(p));
+    const results = await Promise.all(promises);
+    for (const torrents of results) {
+      buildMagnetCache(torrents);
+    }
+  }
+
+  // src/sites/acgrip.ts
+  var acgripAdapter = {
+    siteId: "acgrip",
+    siteName: "ACG.RIP",
+    matchPatterns: ["https://acg.rip/*"],
+    tableSelector: "table",
+    rowSelector: "tbody tr",
+    titleHeader: "标题",
+    magnetCellSelector: "a[href$='.torrent']",
+    extractMagnet(row) {
+      const link = row.querySelector(this.magnetCellSelector);
+      return link?.href ?? "";
+    },
+    extractTitle(row) {
+      const adapterExt = this;
+      const idx = adapterExt._titleIdx ?? 1;
+      const cells = row.querySelectorAll("td");
+      const cell = cells[idx];
+      if (!cell) return "";
+      const link = cell?.querySelector("a");
+      return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
+    },
+    buildShortMagnet(magnet) {
+      return magnet;
+    }
+  };
+
   // src/sites/index.ts
-  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter];
+  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter, acgnxAdapter, shareacgnxAdapter, bangumiAdapter, acgripAdapter];
   function findAdapter() {
     const url = window.location.href;
     return adapters.find(
@@ -336,7 +431,7 @@
 
   // src/components/Modal.ts
   var modalEl = null;
-  function openModal() {
+  async function openModal() {
     if (modalEl) {
       modalEl.remove();
       modalEl = null;
@@ -354,6 +449,9 @@
         magnet: adapter.extractMagnet(row)
       };
     });
+    if (adapter.siteId === "bangumi") {
+      await prefetchMagnetsForSelection(selectedIndexes);
+    }
     modalEl = document.createElement("div");
     modalEl.className = "amc-modal-overlay";
     modalEl.innerHTML = `

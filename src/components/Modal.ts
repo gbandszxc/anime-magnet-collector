@@ -2,10 +2,11 @@ import { selectionStore } from "./SelectionStore";
 import { findAdapter } from "../sites/index";
 import type { MagnetItem } from "../sites/types";
 import { copyMagnetsToClipboard, formatTitle, isLongMagnet } from "../utils/magnet";
+import { getRequiredPages, prefetchMagnetsForSelection } from "../sites/bangumi";
 
 let modalEl: HTMLDivElement | null = null;
 
-export function openModal(): void {
+export async function openModal(): Promise<void> {
   if (modalEl) {
     modalEl.remove();
     modalEl = null;
@@ -26,6 +27,11 @@ export function openModal(): void {
       magnet: adapter.extractMagnet(row),
     };
   });
+
+  // 如果是 bangumi.moe，先预取 magnet
+  if (adapter.siteId === "bangumi") {
+    await prefetchMagnetsForSelection(selectedIndexes);
+  }
 
   modalEl = document.createElement("div");
   modalEl.className = "amc-modal-overlay";
