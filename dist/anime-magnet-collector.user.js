@@ -9,6 +9,8 @@
 // @match      https://dmhy.anoneko.com/*
 // @match      https://nyaa.si/*
 // @match      https://sukebei.nyaa.si/*
+// @match      https://www.acgnx.se/*
+// @match      https://share.acgnx.se/*
 // @grant      GM_addStyle
 // @grant      GM_log
 // @updateURL    https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/dist/anime-magnet-collector.user.js

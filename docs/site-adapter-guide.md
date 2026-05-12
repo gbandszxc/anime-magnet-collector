@@ -208,8 +208,8 @@ bun run verify:dist
 | anoneko | anoneko.ts | dmhy | 继承，仅修改 URL |
 | nyaa | nyaa.ts | - | 完整定义，标题列索引 1 |
 | sukebei | sukebei.ts | nyaa | 继承，覆盖 `_titleIdx: 1` |
-| acgnx | acgnx.ts | - | 完整定义，标题列索引 2 |
-| shareacgnx | shareacgnx.ts | - | 完整定义，标题列索引 2 |
+| acgnx | acgnx.ts | - | 完整定义，标题列索引 2，磁链 selector `#magnet` |
+| shareacgnx | shareacgnx.ts | - | 完整定义，标题列索引 2，磁链 selector `#magnet` |
 
 ---
 
