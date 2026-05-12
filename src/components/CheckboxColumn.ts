@@ -39,6 +39,12 @@ export function getColumnIndices(adapter: SiteAdapter): { titleCellIndex: number
 }
 
 export function injectCheckboxColumn(adapter: SiteAdapter): void {
+  // bangumi.moe 使用非表格结构，独立处理
+  if (adapter.siteId === "bangumi") {
+    injectBangumiCheckbox(adapter);
+    return;
+  }
+
   const table = document.querySelector<HTMLTableElement>(adapter.tableSelector);
   if (!table) return;
 
@@ -121,7 +127,106 @@ export function injectCheckboxColumn(adapter: SiteAdapter): void {
   });
 }
 
+/**
+ * bangumi.moe 的 checkbox 注入（Angular Material 列表结构）
+ */
+function injectBangumiCheckbox(adapter: SiteAdapter): void {
+  // 注入 CSS 样式
+  const existingStyle = document.getElementById("amc-bangumi-style");
+  if (!existingStyle) {
+    const style = document.createElement("style");
+    style.id = "amc-bangumi-style";
+    style.textContent = `
+      md-item.torrent-row {
+        display: flex !important;
+        align-items: center !important;
+      }
+      md-item.torrent-row > md-item-content {
+        flex: 1;
+      }
+      .amc-bangumi-cb {
+        width: 52px;
+        margin-right: 12px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .amc-bangumi-cb input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  let dataList: Element | null = null;
+  for (const list of document.querySelectorAll(adapter.tableSelector)) {
+    if (list.querySelectorAll(adapter.rowSelector).length > 0) {
+      dataList = list;
+      break;
+    }
+  }
+  if (!dataList) return;
+
+  // 获取所有行
+  const items = dataList.querySelectorAll(adapter.rowSelector);
+
+  items.forEach((item, idx) => {
+    // 检查是否已有 checkbox
+    if (item.querySelector(".amc-bangumi-cb")) return;
+
+    // 创建 checkbox wrapper
+    const wrapper = document.createElement("div");
+    wrapper.className = "amc-bangumi-cb";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.dataset.rowIndex = String(idx);
+    checkbox.checked = selectionStore.isSelected(idx);
+
+    wrapper.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    checkbox.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    checkbox.addEventListener("change", (event) => {
+      event.stopPropagation();
+      if (checkbox.checked !== selectionStore.isSelected(idx)) {
+        selectionStore.toggle(idx);
+      }
+    });
+
+    wrapper.appendChild(checkbox);
+
+    // 插入到 md-item-content 前面
+    const content = item.querySelector("md-item-content");
+    if (content) {
+      item.insertBefore(wrapper, content);
+    }
+  });
+
+  selectionStore.onChange(() => {
+    items.forEach((_, i) => {
+      const cb = dataList.querySelector<HTMLInputElement>(`[data-row-index="${i}"]`);
+      if (cb) cb.checked = selectionStore.isSelected(i);
+    });
+  });
+}
+
 export function removeCheckboxColumn(adapter: SiteAdapter): void {
+  if (adapter.siteId === "bangumi") {
+    // 移除 bangumi 的 checkbox 和样式
+    document.querySelectorAll(".amc-bangumi-cb").forEach((el) => el.remove());
+    const style = document.getElementById("amc-bangumi-style");
+    if (style) style.remove();
+    selectionStore.deselectAll();
+    return;
+  }
+
   const table = document.querySelector<HTMLTableElement>(adapter.tableSelector);
   if (!table) return;
 

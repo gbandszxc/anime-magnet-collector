@@ -16,22 +16,22 @@ export async function openModal(): Promise<void> {
   if (!adapter) return;
 
   const selectedIndexes = selectionStore.getSelected();
-  const table = document.querySelector<HTMLTableElement>(adapter.tableSelector);
-  if (!table) return;
-
-  const rows = table.querySelectorAll<HTMLTableRowElement>(adapter.rowSelector);
-  const selectedItems = selectedIndexes.map(idx => {
-    const row = rows[idx];
-    return {
-      title: adapter.extractTitle(row),
-      magnet: adapter.extractMagnet(row),
-    };
-  });
-
-  // 如果是 bangumi.moe，先预取 magnet
   if (adapter.siteId === "bangumi") {
     await prefetchMagnetsForSelection(selectedIndexes);
   }
+
+  const rows = adapter.siteId === "bangumi"
+    ? document.querySelectorAll<Element>(adapter.rowSelector)
+    : document.querySelector<HTMLTableElement>(adapter.tableSelector)?.querySelectorAll<Element>(adapter.rowSelector);
+  if (!rows) return;
+
+  const selectedItems = selectedIndexes.map(idx => {
+    const row = rows[idx];
+    return {
+      title: row ? adapter.extractTitle(row) : "",
+      magnet: row ? adapter.extractMagnet(row) : "",
+    };
+  });
 
   modalEl = document.createElement("div");
   modalEl.className = "amc-modal-overlay";

@@ -4,24 +4,36 @@ export const bangumiAdapter: SiteAdapter = {
   siteId: "bangumi",
   siteName: "萌番组",
   matchPatterns: ["https://bangumi.moe/*"],
-  tableSelector: "md-list.torrent-list",
-  rowSelector: "md-list-item, [class*='torrent']",
+  tableSelector: ".torrent-list",
+  rowSelector: "md-item.torrent-row",
   titleHeader: "",
   magnetCellSelector: "",
 
   extractMagnet(row: Element): string {
-    return "";
+    const id = extractTorrentId(row);
+    return id ? getMagnetFromCache(id) ?? "" : "";
   },
 
   extractTitle(row: Element): string {
-    const titleLink = row.querySelector<HTMLAnchorElement>('a[href^="/torrent/"]');
-    return titleLink?.textContent?.trim() ?? "";
+    const titleEl = row.querySelector<HTMLElement>(".torrent-title h3");
+    const title = titleEl?.textContent?.trim();
+    if (title) return title.replace(/\s+/g, " ");
+
+    const titleContainer = row.querySelector<HTMLElement>(".torrent-title");
+    return titleContainer?.firstChild?.textContent?.trim().replace(/\s+/g, " ") ?? "";
   },
 
   buildShortMagnet(magnet: string): string | null {
     return magnet;
   }
 };
+
+function extractTorrentId(row: Element): string | null {
+  const link = row.querySelector<HTMLAnchorElement>('a[href^="/torrent/"], a[href*="/torrent/"]');
+  const href = link?.getAttribute("href") ?? "";
+  const match = href.match(/\/torrent\/([^/?#]+)/);
+  return match ? match[1] : null;
+}
 
 // Magnet 缓存
 let magnetCache = new Map<string, string>();

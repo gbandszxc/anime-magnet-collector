@@ -192,22 +192,35 @@
     siteId: "bangumi",
     siteName: "萌番组",
     matchPatterns: ["https://bangumi.moe/*"],
-    tableSelector: "md-list.torrent-list",
-    rowSelector: "md-list-item, [class*='torrent']",
+    tableSelector: ".torrent-list",
+    rowSelector: "md-item.torrent-row",
     titleHeader: "",
     magnetCellSelector: "",
     extractMagnet(row) {
-      return "";
+      const id = extractTorrentId(row);
+      return id ? getMagnetFromCache(id) ?? "" : "";
     },
     extractTitle(row) {
-      const titleLink = row.querySelector('a[href^="/torrent/"]');
-      return titleLink?.textContent?.trim() ?? "";
+      const titleEl = row.querySelector(".torrent-title h3");
+      const title = titleEl?.textContent?.trim();
+      if (title) return title.replace(/\s+/g, " ");
+      const titleContainer = row.querySelector(".torrent-title");
+      return titleContainer?.firstChild?.textContent?.trim().replace(/\s+/g, " ") ?? "";
     },
     buildShortMagnet(magnet) {
       return magnet;
     }
   };
+  function extractTorrentId(row) {
+    const link = row.querySelector('a[href^="/torrent/"], a[href*="/torrent/"]');
+    const href = link?.getAttribute("href") ?? "";
+    const match = href.match(/\/torrent\/([^/?#]+)/);
+    return match ? match[1] : null;
+  }
   var magnetCache = /* @__PURE__ */ new Map();
+  function getMagnetFromCache(id) {
+    return magnetCache.get(id);
+  }
   function buildMagnetCache(torrents) {
     for (const t of torrents) {
       if (t._id && t.magnet) {
@@ -356,6 +369,10 @@
     return { titleCellIndex: titleIdx, magnetCellIndex: magnetIdx };
   }
   function injectCheckboxColumn(adapter) {
+    if (adapter.siteId === "bangumi") {
+      injectBangumiCheckbox(adapter);
+      return;
+    }
     const table = document.querySelector(adapter.tableSelector);
     if (!table) return;
     if (table.querySelector(".amc-checkbox-col")) return;
@@ -419,7 +436,85 @@
       updateHeaderState();
     });
   }
+  function injectBangumiCheckbox(adapter) {
+    const existingStyle = document.getElementById("amc-bangumi-style");
+    if (!existingStyle) {
+      const style = document.createElement("style");
+      style.id = "amc-bangumi-style";
+      style.textContent = `
+      md-item.torrent-row {
+        display: flex !important;
+        align-items: center !important;
+      }
+      md-item.torrent-row > md-item-content {
+        flex: 1;
+      }
+      .amc-bangumi-cb {
+        width: 52px;
+        margin-right: 12px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .amc-bangumi-cb input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+    `;
+      document.head.appendChild(style);
+    }
+    let dataList = null;
+    for (const list of document.querySelectorAll(adapter.tableSelector)) {
+      if (list.querySelectorAll(adapter.rowSelector).length > 0) {
+        dataList = list;
+        break;
+      }
+    }
+    if (!dataList) return;
+    const items = dataList.querySelectorAll(adapter.rowSelector);
+    items.forEach((item, idx) => {
+      if (item.querySelector(".amc-bangumi-cb")) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = "amc-bangumi-cb";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.rowIndex = String(idx);
+      checkbox.checked = selectionStore.isSelected(idx);
+      wrapper.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      checkbox.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      checkbox.addEventListener("change", (event) => {
+        event.stopPropagation();
+        if (checkbox.checked !== selectionStore.isSelected(idx)) {
+          selectionStore.toggle(idx);
+        }
+      });
+      wrapper.appendChild(checkbox);
+      const content = item.querySelector("md-item-content");
+      if (content) {
+        item.insertBefore(wrapper, content);
+      }
+    });
+    selectionStore.onChange(() => {
+      items.forEach((_, i) => {
+        const cb = dataList.querySelector(`[data-row-index="${i}"]`);
+        if (cb) cb.checked = selectionStore.isSelected(i);
+      });
+    });
+  }
   function removeCheckboxColumn(adapter) {
+    if (adapter.siteId === "bangumi") {
+      document.querySelectorAll(".amc-bangumi-cb").forEach((el) => el.remove());
+      const style = document.getElementById("amc-bangumi-style");
+      if (style) style.remove();
+      selectionStore.deselectAll();
+      return;
+    }
     const table = document.querySelector(adapter.tableSelector);
     if (!table) return;
     table.querySelectorAll(".amc-checkbox-col").forEach((cell) => cell.remove());
@@ -436,19 +531,18 @@
     const adapter = findAdapter();
     if (!adapter) return;
     const selectedIndexes = selectionStore.getSelected();
-    const table = document.querySelector(adapter.tableSelector);
-    if (!table) return;
-    const rows = table.querySelectorAll(adapter.rowSelector);
-    const selectedItems = selectedIndexes.map((idx) => {
-      const row = rows[idx];
-      return {
-        title: adapter.extractTitle(row),
-        magnet: adapter.extractMagnet(row)
-      };
-    });
     if (adapter.siteId === "bangumi") {
       await prefetchMagnetsForSelection(selectedIndexes);
     }
+    const rows = adapter.siteId === "bangumi" ? document.querySelectorAll(adapter.rowSelector) : document.querySelector(adapter.tableSelector)?.querySelectorAll(adapter.rowSelector);
+    if (!rows) return;
+    const selectedItems = selectedIndexes.map((idx) => {
+      const row = rows[idx];
+      return {
+        title: row ? adapter.extractTitle(row) : "",
+        magnet: row ? adapter.extractMagnet(row) : ""
+      };
+    });
     modalEl = document.createElement("div");
     modalEl.className = "amc-modal-overlay";
     modalEl.innerHTML = `
@@ -823,28 +917,41 @@
     }
     log(`检测到站点: ${adapter.siteName}`);
     if (adapter.siteId === "bangumi") {
-      const container = document.querySelector(adapter.tableSelector);
-      if (container) {
-        let injected = false;
-        const observer = new MutationObserver((mutations, obs) => {
-          if (injected) {
-            obs.disconnect();
-            return;
-          }
-          const items = container.querySelectorAll(adapter.rowSelector);
-          if (items.length > 0) {
-            injectToolbar({
-              onClose: () => removeCheckboxColumn(adapter)
-            });
-            injectCheckboxColumn(adapter);
-            injected = true;
-            obs.disconnect();
-          }
+      let observer = null;
+      let scheduled = false;
+      const ensureInjected = () => {
+        const rows = document.querySelectorAll(adapter.rowSelector);
+        if (rows.length === 0) return false;
+        if (!document.getElementById("amc-float")) {
+          injectToolbar({
+            onClose: () => {
+              observer?.disconnect();
+              observer = null;
+              removeCheckboxColumn(adapter);
+            }
+          });
+        }
+        injectCheckboxColumn(adapter);
+        return true;
+      };
+      const scheduleEnsureInjected = () => {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+          scheduled = false;
+          ensureInjected();
         });
-        observer.observe(container, { childList: true, subtree: true });
+      };
+      observer = new MutationObserver(() => {
+        scheduleEnsureInjected();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      if (ensureInjected()) {
+        log("初始化完成");
+      } else {
         log("等待列表渲染...");
-        return;
       }
+      return;
     }
     injectToolbar({
       onClose: () => removeCheckboxColumn(adapter)

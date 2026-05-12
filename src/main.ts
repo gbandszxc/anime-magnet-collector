@@ -33,29 +33,46 @@ function init(): void {
   log(`检测到站点: ${adapter.siteName}`);
 
   if (adapter.siteId === "bangumi") {
-    // 等待 md-list 渲染完成
-    const container = document.querySelector(adapter.tableSelector);
-    if (container) {
-      let injected = false;
-      const observer = new MutationObserver((mutations, obs) => {
-        if (injected) {
-          obs.disconnect();
-          return;
-        }
-        const items = container.querySelectorAll(adapter.rowSelector);
-        if (items.length > 0) {
-          injectToolbar({
-            onClose: () => removeCheckboxColumn(adapter),
-          });
-          injectCheckboxColumn(adapter);
-          injected = true;
-          obs.disconnect();
-        }
+    let observer: MutationObserver | null = null;
+    let scheduled = false;
+
+    const ensureInjected = (): boolean => {
+      const rows = document.querySelectorAll(adapter.rowSelector);
+      if (rows.length === 0) return false;
+
+      if (!document.getElementById("amc-float")) {
+        injectToolbar({
+          onClose: () => {
+            observer?.disconnect();
+            observer = null;
+            removeCheckboxColumn(adapter);
+          },
+        });
+      }
+      injectCheckboxColumn(adapter);
+      return true;
+    };
+
+    const scheduleEnsureInjected = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        ensureInjected();
       });
-      observer.observe(container, { childList: true, subtree: true });
+    };
+
+    observer = new MutationObserver(() => {
+      scheduleEnsureInjected();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    if (ensureInjected()) {
+      log("初始化完成");
+    } else {
       log("等待列表渲染...");
-      return;
     }
+    return;
   }
 
   injectToolbar({
