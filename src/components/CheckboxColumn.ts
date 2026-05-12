@@ -13,8 +13,8 @@ function findCellIndex(adapter: SiteAdapter, headerText: string): number {
   for (let i = 0; i < headers.length; i++) {
     const text = headers[i].textContent?.trim() ?? "";
     if (text === headerText) {
-      // checkbox th 会在 prepend 后位于最左侧，所以 data column index = i + 1（跳过 checkbox）
-      return i + 1;
+      // header 已经有 prepended checkbox，所以直接用 i
+      return i;
     }
   }
   return -1;
