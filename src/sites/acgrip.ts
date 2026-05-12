@@ -15,13 +15,9 @@ export const acgripAdapter: SiteAdapter = {
   },
 
   extractTitle(row: Element): string {
-    const adapterExt = this as SiteAdapter & { _titleIdx?: number };
-    const idx = adapterExt._titleIdx ?? 1;
-    const cells = row.querySelectorAll("td");
-    const cell = cells[idx];
-    if (!cell) return "";
-    const link = cell?.querySelector("a");
-    return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
+    // 直接通过 href 格式找标题链接（/t/{id}），不依赖列索引
+    const titleLink = row.querySelector<HTMLAnchorElement>('a[href*="/t/"]');
+    return titleLink?.textContent?.trim() ?? "";
   },
 
   buildShortMagnet(magnet: string): string | null {

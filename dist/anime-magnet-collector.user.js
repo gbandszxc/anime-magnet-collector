@@ -11,6 +11,8 @@
 // @match      https://sukebei.nyaa.si/*
 // @match      https://www.acgnx.se/*
 // @match      https://share.acgnx.se/*
+// @match      https://bangumi.moe/*
+// @match      https://acg.rip/*
 // @grant      GM_addStyle
 // @grant      GM_log
 // @updateURL    https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/dist/anime-magnet-collector.user.js
@@ -267,13 +269,8 @@
       return link?.href ?? "";
     },
     extractTitle(row) {
-      const adapterExt = this;
-      const idx = adapterExt._titleIdx ?? 1;
-      const cells = row.querySelectorAll("td");
-      const cell = cells[idx];
-      if (!cell) return "";
-      const link = cell?.querySelector("a");
-      return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
+      const titleLink = row.querySelector('a[href*="/t/"]');
+      return titleLink?.textContent?.trim() ?? "";
     },
     buildShortMagnet(magnet) {
       return magnet;
@@ -343,7 +340,7 @@
     for (let i = 0; i < headers.length; i++) {
       const text = headers[i].textContent?.trim() ?? "";
       if (text === headerText) {
-        return i + 1;
+        return i;
       }
     }
     return -1;
