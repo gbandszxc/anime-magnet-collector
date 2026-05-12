@@ -55,6 +55,8 @@
 | **动漫花园(镜像)** (dmhy.anoneko.com) | 资源列表页 |
 | **Nyaa** (nyaa.si) | 资源列表页 |
 | **Sukebei** (sukebei.nyaa.si) | 资源列表页 |
+| **AcgnX** (www.acgnx.se) | 资源列表页 |
+| **AcgnX中文站** (share.acgnx.se) | 资源列表页 |
 
 ---
 
@@ -95,6 +97,185 @@ magnet:?xt=urn:btih:{INFOHASH}
 
 - `xt=urn:btih:` - BT 资源标识符类型
 - `INFOHASH` - 40 字符的 SHA-1 哈希（Base16 大写）
+
+---
+
+## 适配新站点
+
+### 流程概览
+
+适配新站点只需三步：
+
+1. **分析页面结构** - 确定表格列顺序和磁链选择器
+2. **创建适配器文件** - 在 `src/sites/` 下新建站点文件
+3. **注册并构建** - 更新 `index.ts` 并验证构建
+
+---
+
+### 第一步：分析页面结构
+
+在目标站点页面打开浏览器控制台，执行以下分析：
+
+#### 1. 获取表格表头
+
+```javascript
+// 获取表格所有列的表头文字
+const headers = Array.from(document.querySelectorAll('table th')).map(th => th.textContent.trim());
+console.log('表头:', headers);
+```
+
+#### 2. 获取第一行数据
+
+```javascript
+// 获取第一行所有单元格内容
+const firstRow = document.querySelector('table tbody tr');
+const cells = Array.from(firstRow.cells).map((td, i) => `${i}: ${td.textContent.trim().substring(0, 30)}`);
+console.log('第一行:', cells);
+```
+
+#### 3. 确定磁链选择器
+
+```javascript
+// 找到磁链链接元素
+const magnetLink = document.querySelector('a[href^="magnet:"]');
+console.log('磁链元素:', magnetLink?.outerHTML);
+```
+
+或者如果磁链元素有特定 ID/Class：
+
+```javascript
+// 检查是否有特定 ID（如 #magnet）
+const magnetById = document.querySelector('#magnet');
+console.log('磁链元素:', magnetById?.outerHTML);
+```
+
+#### 4. 记录关键信息
+
+| 信息 | 示例 |
+|------|------|
+| **表格选择器** | `table#listTable` |
+| **行选择器** | `tbody tr` |
+| **标题列表头** | `Name` |
+| **标题列索引** | 2（第三列） |
+| **磁链选择器** | `#magnet` 或 `a[href^="magnet:"]` |
+| **磁链元素位置** | 是 `<a>` 标签还是其他 |
+
+---
+
+### 第二步：创建适配器文件
+
+在 `src/sites/` 目录下创建新文件（如 `mysite.ts`）：
+
+```typescript
+import type { SiteAdapter } from "./types";
+import { buildShortMagnet } from "../utils/magnet";
+
+export const mysiteAdapter: SiteAdapter = {
+  siteId: "mysite",              // 唯一标识
+  siteName: "我的站点",           // 显示名称
+  matchPatterns: ["https://mysite.com/*"],  // URL 匹配模式
+
+  // 表格选择器
+  tableSelector: "table#listTable",
+  rowSelector: "tbody tr",
+
+  // 标题列配置（用于定位列索引）
+  titleHeader: "Name",           // 表头文字，必须精确匹配
+
+  // 磁链单元格选择器
+  magnetCellSelector: "#magnet",
+
+  // 从行提取磁力链接
+  extractMagnet(row: Element): string {
+    const link = row.querySelector<HTMLAnchorElement>(this.magnetCellSelector);
+    return link?.href ?? "";
+  },
+
+  // 从行提取标题
+  extractTitle(row: Element): string {
+    const cells = row.querySelectorAll("td");
+    const cell = cells[2];  // 标题列索引（根据实际结构调整）
+    const link = cell?.querySelector("a");
+    return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
+  },
+
+  // 长链转短链
+  buildShortMagnet(magnet: string): string | null {
+    return buildShortMagnet(magnet);
+  }
+};
+```
+
+---
+
+### 第三步：注册适配器
+
+#### 1. 更新 import
+
+在 `src/sites/index.ts` 顶部添加：
+
+```typescript
+import { mysiteAdapter } from "./mysite";
+```
+
+#### 2. 添加到 adapters 数组
+
+```typescript
+export const adapters: SiteAdapter[] = [
+  dmhyAdapter,
+  anonekoAdapter,
+  nyaaAdapter,
+  sukebeiAdapter,
+  mysiteAdapter  // 添加到末尾
+];
+```
+
+---
+
+### 第四步：构建验证
+
+```bash
+# 构建
+bun run build
+
+# 验证
+bun run verify:dist
+```
+
+构建成功后，新的站点即可使用。
+
+---
+
+### 适配器字段说明
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `siteId` | string | 是 | 站点唯一标识 |
+| `siteName` | string | 是 | 显示名称 |
+| `matchPatterns` | string[] | 是 | URL 匹配模式，`*` 匹配任意字符 |
+| `tableSelector` | string | 是 | 主表格 CSS 选择器 |
+| `rowSelector` | string | 是 | 表格行选择器（相对于 table） |
+| `titleHeader` | string | 是 | 标题列的表头文字（精确匹配） |
+| `magnetCellSelector` | string | 是 | 磁链元素的 CSS 选择器 |
+| `extractMagnet` | function | 是 | 提取磁链的逻辑 |
+| `extractTitle` | function | 是 | 提取标题的逻辑 |
+| `buildShortMagnet` | function | 否 | 长链转短链，默认使用工具函数 |
+
+---
+
+### 常见问题
+
+**Q: 表头文字包含空格怎么匹配？**
+A: `titleHeader` 必须与页面表头文字精确匹配，包括空格。
+
+**Q: 标题列不在第三列怎么办？**
+A: `extractTitle` 中 `cells[2]` 的索引需要根据实际列位置调整。或者让脚本自动查找：`const idx = Array.from(row.cells).findIndex(td => td.textContent.includes('关键词'));`
+
+**Q: 磁链选择器怎么写？**
+A: 推荐使用能精确定位的选择器：`#magnet`（ID）、`.magnet-link`（Class）或 `a[href^="magnet:"]`（属性选择器）。
+
+**Q: 两个站点结构相同但域名不同？**
+A: 在 `matchPatterns` 中添加多个 URL 模式，或创建两个独立的适配器文件各自注册。
 
 ---
 
