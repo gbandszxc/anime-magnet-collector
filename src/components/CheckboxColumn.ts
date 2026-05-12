@@ -13,8 +13,8 @@ function findCellIndex(adapter: SiteAdapter, headerText: string): number {
   for (let i = 0; i < headers.length; i++) {
     const text = headers[i].textContent?.trim() ?? "";
     if (text === headerText) {
-      // header 已经有 prepended checkbox，所以直接用 i
-      return i;
+      // Rows receive a prepended checkbox cell after this lookup.
+      return i + 1;
     }
   }
   return -1;

@@ -386,7 +386,7 @@
     for (let i = 0; i < headers.length; i++) {
       const text = headers[i].textContent?.trim() ?? "";
       if (text === headerText) {
-        return i;
+        return i + 1;
       }
     }
     return -1;
