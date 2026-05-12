@@ -36,7 +36,7 @@ const isWatchMode = process.argv.includes("--watch");
 // Dynamically read match patterns from site adapter files
 const sitesDir = path.join(projectRoot, "src", "sites");
 const matchLines = [];
-const files = ["dmhy.ts", "anoneko.ts", "nyaa.ts", "sukebei.ts", "acgnx.ts", "shareacgnx.ts"];
+const files = ["dmhy.ts", "anoneko.ts", "nyaa.ts", "sukebei.ts", "acgnx.ts", "shareacgnx.ts", "bangumi.ts", "acgrip.ts"];
 for (const file of files) {
   const filePath = path.join(sitesDir, file);
   const content = await readFile(filePath, "utf8");
