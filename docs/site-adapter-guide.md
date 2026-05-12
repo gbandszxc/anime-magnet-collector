@@ -175,7 +175,9 @@ export const mysiteAdapter: SiteAdapter = {
 
 ### 第三阶段：注册适配器
 
-编辑 `src/sites/index.ts`：
+需要同时更新两个文件：
+
+#### 1. 更新 `src/sites/index.ts`
 
 ```typescript
 import { mysiteAdapter } from "./mysite";  // 添加 import
@@ -188,6 +190,16 @@ export const adapters: SiteAdapter[] = [
   mysiteAdapter  // 添加到数组
 ];
 ```
+
+#### 2. 更新 `scripts/build.mjs`
+
+将新文件添加到 `files` 数组中：
+
+```javascript
+const files = ["dmhy.ts", "anoneko.ts", "nyaa.ts", "sukebei.ts", "acgnx.ts", "shareacgnx.ts", "mysite.ts"];
+```
+
+> **注意**：构建脚本通过读取 `files` 数组中的适配器文件来提取 `@match` URL 模式。如果遗漏此处，新站点将不会被注入脚本。
 
 ---
 
