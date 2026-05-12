@@ -54,6 +54,7 @@
 | **动漫花园** (share.dmhy.org) | 资源列表页 |
 | **动漫花园(镜像)** (dmhy.anoneko.com) | 资源列表页 |
 | **Nyaa** (nyaa.si) | 资源列表页 |
+| **Sukebei** (sukebei.nyaa.si) | 资源列表页 |
 
 ---
 

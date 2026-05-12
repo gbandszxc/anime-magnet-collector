@@ -9,6 +9,7 @@ export interface SiteAdapter {
   extractMagnet(row: Element): string; // 从行提取磁力链
   extractTitle(row: Element): string;  // 从行提取标题
   buildShortMagnet?(magnet: string): string | null; // 长链转短链（可选）
+  _titleIdx?: number;                  // 内部字段：标题列索引（用于覆盖默认查找逻辑）
 }
 
 export interface MagnetItem {

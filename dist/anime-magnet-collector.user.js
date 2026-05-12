@@ -8,6 +8,7 @@
 // @match      https://share.dmhy.org/*
 // @match      https://dmhy.anoneko.com/*
 // @match      https://nyaa.si/*
+// @match      https://sukebei.nyaa.si/*
 // @grant      GM_addStyle
 // @grant      GM_log
 // @updateURL    https://raw.githubusercontent.com/gbandszxc/anime-magnet-collector/main/dist/anime-magnet-collector.user.js
@@ -119,8 +120,17 @@
     }
   };
 
+  // src/sites/sukebei.ts
+  var sukebeiAdapter = {
+    ...nyaaAdapter,
+    siteId: "sukebei",
+    siteName: "Sukebei",
+    matchPatterns: ["https://sukebei.nyaa.si/*"],
+    _titleIdx: 1
+  };
+
   // src/sites/index.ts
-  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter];
+  var adapters = [dmhyAdapter, anonekoAdapter, nyaaAdapter, sukebeiAdapter];
   function findAdapter() {
     const url = window.location.href;
     return adapters.find(
