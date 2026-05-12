@@ -100,12 +100,6 @@ magnet:?xt=urn:btih:{INFOHASH}
 
 ---
 
-## 适配新站点
-
-详细开发指南请参阅 [站点适配器开发指南](./docs/site-adapter-guide.md)。
-
----
-
 ## 开发
 
 ### 环境要求
@@ -150,6 +144,10 @@ bun run verify:dist
 │   └── build.mjs           # 主构建脚本
 └── package.json
 ```
+
+### 适配新站点
+
+详细开发指南请参阅 [站点适配器开发指南](./docs/site-adapter-guide.md)。
 
 ---
 
