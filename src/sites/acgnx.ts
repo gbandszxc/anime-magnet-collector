@@ -16,8 +16,11 @@ export const acgnxAdapter: SiteAdapter = {
   },
 
   extractTitle(row: Element): string {
+    const adapterExt = this as SiteAdapter & { _titleIdx?: number };
+    const idx = adapterExt._titleIdx ?? 3;
     const cells = row.querySelectorAll("td");
-    const cell = cells[2]; // Date(0) | Category(1) | Name(2)
+    const cell = cells[idx];
+    if (!cell) return "";
     const link = cell?.querySelector("a");
     return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
   },

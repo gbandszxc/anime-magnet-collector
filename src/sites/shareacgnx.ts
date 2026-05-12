@@ -16,8 +16,11 @@ export const shareacgnxAdapter: SiteAdapter = {
   },
 
   extractTitle(row: Element): string {
+    const adapterExt = this as SiteAdapter & { _titleIdx?: number };
+    const idx = adapterExt._titleIdx ?? 3;
     const cells = row.querySelectorAll("td");
-    const cell = cells[2]; // 發佈時間(0) | 分類(1) | 資源名稱(2)
+    const cell = cells[idx];
+    if (!cell) return "";
     const link = cell?.querySelector("a");
     return link?.textContent?.trim() ?? cell?.textContent?.trim() ?? "";
   },
