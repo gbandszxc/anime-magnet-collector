@@ -45,3 +45,53 @@ export function buildMagnetCache(torrents: any[]): void {
     }
   }
 }
+
+// 判断是否为首页
+function isHomepage(): boolean {
+  return window.location.pathname === "/";
+}
+
+// 从 URL 提取 tag_id (用于搜索页)
+function extractTagId(): string | null {
+  const match = window.location.pathname.match(/\/search\/([^/]+)/);
+  return match ? match[1] : null;
+}
+
+// 获取指定页的 torrents
+async function fetchMagnetPage(page: number): Promise<any[]> {
+  if (isHomepage()) {
+    const res = await fetch(`/api/torrent/latest?page=${page}`);
+    const data = await res.json();
+    return data.torrents || [];
+  } else {
+    const tagId = extractTagId();
+    if (!tagId) return [];
+
+    const res = await fetch("/api/torrent/search", {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
+      body: JSON.stringify({ tag_id: [tagId], p: page })
+    });
+    const data = await res.json();
+    return data.torrents || [];
+  }
+}
+
+// 计算选中项需要哪些页
+export function getRequiredPages(selectedIndexes: number[]): number[] {
+  const pages = new Set<number>();
+  for (const idx of selectedIndexes) {
+    pages.add(Math.floor(idx / 30) + 1);
+  }
+  return Array.from(pages).sort((a, b) => a - b);
+}
+
+// 批量预取 magnet 并缓存
+export async function prefetchMagnetsForSelection(selectedIndexes: number[]): Promise<void> {
+  const pages = getRequiredPages(selectedIndexes);
+  const promises = pages.map(p => fetchMagnetPage(p));
+  const results = await Promise.all(promises);
+  for (const torrents of results) {
+    buildMagnetCache(torrents);
+  }
+}
