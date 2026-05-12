@@ -16,6 +16,18 @@
 5. 涉及 userscript metadata、构建脚本修改时，需同步确认 `scripts/build.mjs` 的 banner 头部与产物一致。
 6. **README.md 同步**：构建时自动将 `package.json` version 同步到 `README.md` 的 changelog 版本号。
 
+## 测试与验证
+
+1. 修改站点适配器、选择列、Modal 回显、磁链提取逻辑后，必须运行 `bun test`。当前测试包含各站点精简 DOM fixture，用于复测 checkbox 注入后标题和磁链提取是否正确。
+2. 提交前运行 `bun run typecheck`，确保 TypeScript 类型检查通过。
+3. 修改 `src/` 后如需更新发布产物，运行 `bun run build`，不要手改 `dist/anime-magnet-collector.user.js`。
+4. 发布或提交包含 `dist/` 的改动前，运行 `bun run verify:dist`，确认产物与源码构建结果一致。
+5. 常用完整验证顺序：
+   - `bun test`
+   - `bun run typecheck`
+   - `bun run build`
+   - `bun run verify:dist`
+
 ## 样式规范
 
 **设计系统文档**：`DESIGN.md` - 包含完整的设计 token、组件规范和示例。

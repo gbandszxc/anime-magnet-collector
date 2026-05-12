@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { Window } from "happy-dom";
-import { injectCheckboxColumn, removeCheckboxColumn } from "../components/CheckboxColumn";
-import { selectionStore } from "../components/SelectionStore";
-import { acgnxAdapter } from "./acgnx";
-import { acgripAdapter } from "./acgrip";
-import { anonekoAdapter } from "./anoneko";
-import { bangumiAdapter, clearMagnetCache, setMagnetCache } from "./bangumi";
-import { dmhyAdapter } from "./dmhy";
-import { kisssubAdapter } from "./kisssub";
-import { nyaaAdapter } from "./nyaa";
-import { shareacgnxAdapter } from "./shareacgnx";
-import { sukebeiAdapter } from "./sukebei";
-import type { SiteAdapter } from "./types";
+import { injectCheckboxColumn, removeCheckboxColumn } from "../src/components/CheckboxColumn";
+import { selectionStore } from "../src/components/SelectionStore";
+import { acgnxAdapter } from "../src/sites/acgnx";
+import { acgripAdapter } from "../src/sites/acgrip";
+import { anonekoAdapter } from "../src/sites/anoneko";
+import { bangumiAdapter, clearMagnetCache, setMagnetCache } from "../src/sites/bangumi";
+import { dmhyAdapter } from "../src/sites/dmhy";
+import { kisssubAdapter } from "../src/sites/kisssub";
+import { nyaaAdapter } from "../src/sites/nyaa";
+import { shareacgnxAdapter } from "../src/sites/shareacgnx";
+import { sukebeiAdapter } from "../src/sites/sukebei";
+import type { SiteAdapter } from "../src/sites/types";
 
 type TableFixture = {
   name: string;

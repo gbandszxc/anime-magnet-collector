@@ -205,7 +205,16 @@ const files = ["dmhy.ts", "anoneko.ts", "nyaa.ts", "sukebei.ts", "acgnx.ts", "sh
 
 ### 第四阶段：验证
 
+新增或修改站点适配器时，必须同步维护 `tests/site-fixtures.test.ts`：
+
+1. 为新适配器添加一个最小 DOM fixture，只保留表头、首行资源、标题链接、磁链链接等关键结构。
+2. fixture 应覆盖 checkbox 注入后的行为，确保 `extractTitle(row)` 和 `extractMagnet(row)` 仍能返回正确值。
+3. 如果新站点继承已有适配器，也要添加独立用例，避免 URL/表头/列顺序差异被遗漏。
+4. 如果线上站点可访问，优先用浏览器 DevTools 抓取当前真实表头和首行结构，再精简为 fixture；不要保存整页 HTML。
+
 ```bash
+bun test
+bun run typecheck
 bun run build
 bun run verify:dist
 ```
@@ -220,8 +229,8 @@ bun run verify:dist
 | anoneko | anoneko.ts | dmhy | 继承，仅修改 URL |
 | nyaa | nyaa.ts | - | 完整定义，标题列索引 1 |
 | sukebei | sukebei.ts | nyaa | 继承，覆盖 `_titleIdx: 1` |
-| acgnx | acgnx.ts | - | 完整定义，标题列索引 2，磁链 selector `#magnet` |
-| shareacgnx | shareacgnx.ts | - | 完整定义，标题列索引 2，磁链 selector `#magnet` |
+| acgnx | acgnx.ts | - | 完整定义，标题列索引 2，磁链 selector `a[href^="magnet:"]` |
+| shareacgnx | shareacgnx.ts | - | 完整定义，标题列索引 2，磁链 selector `a[href^="magnet:"]` |
 
 ---
 
