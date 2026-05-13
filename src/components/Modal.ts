@@ -5,11 +5,11 @@ import { copyMagnetsToClipboard, formatTitle, isLongMagnet } from "../utils/magn
 import { prefetchMagnetsForSelection } from "../sites/bangumi";
 
 let modalEl: HTMLDivElement | null = null;
+let modalKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
 export async function openModal(): Promise<void> {
   if (modalEl) {
-    modalEl.remove();
-    modalEl = null;
+    closeModal();
   }
 
   const adapter = findAdapter();
@@ -90,12 +90,24 @@ export async function openModal(): Promise<void> {
   };
 
   modalEl.querySelector<HTMLButtonElement>("#amc-cancel")!.onclick = closeModal;
-  modalEl.querySelector<HTMLDivElement>(".amc-modal-overlay")!.onclick = (e) => {
+  modalEl.onclick = (e) => {
     if (e.target === modalEl) closeModal();
   };
+
+  modalKeydownHandler = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      closeModal();
+    }
+  };
+  document.addEventListener("keydown", modalKeydownHandler);
 }
 
 export function closeModal(): void {
+  if (modalKeydownHandler) {
+    document.removeEventListener("keydown", modalKeydownHandler);
+    modalKeydownHandler = null;
+  }
+
   if (modalEl) {
     modalEl.remove();
     modalEl = null;

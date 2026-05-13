@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import { injectCheckboxColumn, removeCheckboxColumn } from "../src/components/CheckboxColumn";
+import { openModal } from "../src/components/Modal";
 import { selectionStore } from "../src/components/SelectionStore";
 import { acgnxAdapter } from "../src/sites/acgnx";
 import { acgripAdapter } from "../src/sites/acgrip";
@@ -21,8 +22,8 @@ type TableFixture = {
   expectedMagnet: string;
 };
 
-function mount(html: string): void {
-  const window = new Window({ url: "https://example.test/" });
+function mount(html: string, url = "https://example.test/"): void {
+  const window = new Window({ url });
   window.SyntaxError = SyntaxError;
   globalThis.window = window as unknown as globalThis.Window & typeof globalThis;
   globalThis.document = window.document as unknown as Document;
@@ -249,5 +250,23 @@ describe("site adapter DOM fixtures", () => {
     expect(row!.querySelector(".amc-bangumi-cb")).not.toBeNull();
 
     removeCheckboxColumn(subject);
+  });
+});
+
+describe("modal interactions", () => {
+  test("pressing Escape closes the copy preview modal", async () => {
+    const subject = cloneAdapter(dmhyAdapter);
+    mount(dmhyTable, "https://share.dmhy.org/topics/list");
+
+    injectCheckboxColumn(subject);
+    selectionStore.selectAll([0]);
+
+    await openModal();
+
+    expect(document.querySelector(".amc-modal-overlay")).not.toBeNull();
+
+    document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" }));
+
+    expect(document.querySelector(".amc-modal-overlay")).toBeNull();
   });
 });

@@ -556,10 +556,10 @@
 
   // src/components/Modal.ts
   var modalEl = null;
+  var modalKeydownHandler = null;
   async function openModal() {
     if (modalEl) {
-      modalEl.remove();
-      modalEl = null;
+      closeModal();
     }
     const adapter = findAdapter();
     if (!adapter) return;
@@ -622,11 +622,21 @@
       closeModal();
     };
     modalEl.querySelector("#amc-cancel").onclick = closeModal;
-    modalEl.querySelector(".amc-modal-overlay").onclick = (e) => {
+    modalEl.onclick = (e) => {
       if (e.target === modalEl) closeModal();
     };
+    modalKeydownHandler = (e) => {
+      if (e.key === "Escape") {
+        closeModal();
+      }
+    };
+    document.addEventListener("keydown", modalKeydownHandler);
   }
   function closeModal() {
+    if (modalKeydownHandler) {
+      document.removeEventListener("keydown", modalKeydownHandler);
+      modalKeydownHandler = null;
+    }
     if (modalEl) {
       modalEl.remove();
       modalEl = null;
